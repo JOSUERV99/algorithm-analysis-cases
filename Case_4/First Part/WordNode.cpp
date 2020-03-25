@@ -10,12 +10,13 @@ protected:
 	std::unordered_map <std::string, int> relations;
 	int appearances;
 public:
+	
 	WordNode(std::string word = ""){
 		this->word = word;
 	}
 
-	std::list<pair<int, std::string>> getRelatedWords(int quantity, int arcWeight);
-	void addIndividualRelation(std::string word);
+	std::list<pair<int, std::string>> getRelatedWords(int quantity);
+	void addRelation(std::string word, int arcWeight = 1);
 	bool existRelation (std::string anotherWord);
 
 };
@@ -28,7 +29,7 @@ std::list<pair<int, std::string>> WordNode::getRelatedWords(int quantity = relat
 	*/
 }
 
-void WordNode::addRelation(std::string word, int arcWeight=1) {
+void WordNode::addRelation(std::string word, int arcWeight = 1) {
 	/* 
 		Objectivo: agregar una nueva relacion dentro del grafo
 

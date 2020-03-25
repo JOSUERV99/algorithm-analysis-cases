@@ -53,7 +53,7 @@ bool PowerRelationsGraph::existsWordInGraph(std::string word) {
 }
 
 
-std::list <WordNode> PowerRelationsGraph::getPowerWords(int c) {
+std::list <WordNode> PowerRelationsGraph::getPowerWords(int c = wordsMap.size()) {
 	/* 
 		Objectivo: Obtener las C palabras más poderosas del texto, siendo C un entero variable.
 		

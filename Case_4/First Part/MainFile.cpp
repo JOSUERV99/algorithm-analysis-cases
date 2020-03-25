@@ -1,3 +1,10 @@
+
+/* 
+	[ author: Josue Rojas Vega ]
+		Borrador de codigo para la generacion del grafo de relaciones de poder a partir del texto dado 
+		Idea para la generacion del algoritmo
+*/
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -13,33 +20,34 @@
 
 #define POWER_WORDS_QUANTITY 10
 #define FILENAME 		    "TextToAnalize.txt"   				// "FirstParagraph.txt"
-
 #define STOPWORDS_FILENAME   "StopWords(SPANISH).txt"
+
 // StopWords file getted from: https://github.com/Alir3z4/stop-words/blob/master/spanish.txt
 
 int main() {
 
-	std::list <std::string> wordsList = TextFormatter::getWordsListFromFile( FILENAME );
-	std::list <std::string> stopWordsList = TextFormatter::getWordsListFromFile( STOPWORDS_FILENAME );
-	std::list <std::string> cleanWordsList = TextFormatter::deleteStopWords( stopWordsList, wordsList );
+	/*
+		Idea de trabajo:
+			1. Extraer las palabras descartando caracteres innecesarios
+			2. Eliminar palabras repetitivas (StopWords)
+			3. Generar el grafo, registrando sus apariciones y las relaciones como un arco donde el peso
+				representa las veces que se han relacionado esas dos palabras. La relacion entre las dos
+				se hara tomando en cuenta alguna de estas alternativas:
+					3.1 Palabra anterior y consecutiva
+					3.2 Palabras dentro de la misma oracion
+					3.3 Palabras dentro del mismo parrafo
+				(Nota: las relaciones de cada palabra se crearan dentro de un mapa o "tabla hash" al igual
+					que el grafo de cada una de ellas, dando como resultado, una mapa de palabras y cada una de 
+					ellas con su mapa de relaciones con las otras, como un grafo)
+			4. Una vex dada la precarga del grafo de palabras (recorrido y creacion de relaciones de las palabras del texto),
+				se podran ejecutar consultas a este para obtener
+				las relaciones de poder, cantidad de apariciones, palabras mas poderosas, cuales palabras se relacion
+				en mayor y menor cantidad,etc.
+	*/
 
-	// std::cout << "Quantity of words " << wordsList.size() << std::endl;
-	// std::cout << "Quantity of stop words " << stopWordsList.size() << std::endl;
-	std::cout << "Quantity of clean words " << cleanWordsList.size() << std::endl;
-	
-	std::unordered_map <std::string, int> appereances;
-	for (auto const &word : cleanWordsList) {
-		appereances[word]++;
-	}
-
-	// testing
-	std::unordered_map<std::string, int>::iterator it = appereances.begin();
-	while (it != appereances.end()) {
-		if (it->second > 10)
-			std::cout << it->first << " : " << it->second << std::endl;
-		it++;
-	}
-
+	//std::list <std::string> wordsList = TextFormatter::getWordsListFromFile( FILENAME );
+	//std::list <std::string> stopWordsList = TextFormatter::getWordsListFromFile( STOPWORDS_FILENAME );
+	//std::list <std::string> cleanWordsList = TextFormatter::deleteStopWords( stopWordsList, wordsList );
 	//TextFormatter::showList(cleanWordsList);
 
 	return EXIT_SUCCESS;

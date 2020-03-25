@@ -27,7 +27,7 @@ namespace TextFormatter {
 				characterReaded = reader.get();
 			}
 			
-			if (text != "") {
+			if (text != "" && text.length() > 1) {
 				transform(text.begin(), text.end(), text.begin(), ::tolower);
 				wordList.push_back(text);
 			}

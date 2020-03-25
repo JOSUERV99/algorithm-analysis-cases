@@ -7,12 +7,33 @@ using namespace std;
 class WordNode { 
 protected:
 	std::string word;
-	std::list<pair<int, std::string>> relations;
+	std::unordered_map <std::string, int> relations;
 	int appearances;
 public:
-	std::list<pair<int, std::string>> getRelatedWords() {return relations;}
+	WordNode(std::string word = ""){
+		this->word = word;
+	}
+
+	std::list<pair<int, std::string>> getRelatedWords(int quantity, int arcWeight);
 	void addIndividualRelation(std::string word);
 	bool existRelation (std::string anotherWord);
-	void deleteRelation(std::string anotherWord);
+
 };
+
+std::list<pair<int, std::string>> WordNode::getRelatedWords(int quantity = relations.size()) {
+	/* 
+		Objectivo: dada sus relaciones obtener la cantidad de palabras pedidas por parametro
+
+		Complejidad esperada: O(n)
+	*/
+}
+
+void WordNode::addRelation(std::string word, int arcWeight=1) {
+	/* 
+		Objectivo: agregar una nueva relacion dentro del grafo
+
+		Complejidad esperada: O(c)
+	*/
+}
+
 

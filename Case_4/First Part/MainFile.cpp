@@ -5,15 +5,16 @@
 #include <list>
 #include <algorithm>
 #include <stdio.h>
+#include <unordered_map>
 
-#include "TextFormatter.cpp" //#include "WordGraph.cpp" TODO: reestructurate the class
+#include "TextFormatter.cpp" 
+//#include "PowerRelationsGraph.cpp"
 #include "WordNode.cpp"
 
 #define POWER_WORDS_QUANTITY 10
-#define FILENAME 		     "TxtText.txt"  				// "TextToAnalize.txt"
-#define STOPWORDS_FILENAME   "StopWords(SPANISH).txt"
+#define FILENAME 		    "TextToAnalize.txt"   				// "FirstParagraph.txt"
 
-// To use the MakeFile in Windows: "nmake -f compile_and_run.mk"
+#define STOPWORDS_FILENAME   "StopWords(SPANISH).txt"
 // StopWords file getted from: https://github.com/Alir3z4/stop-words/blob/master/spanish.txt
 
 int main() {
@@ -22,11 +23,24 @@ int main() {
 	std::list <std::string> stopWordsList = TextFormatter::getWordsListFromFile( STOPWORDS_FILENAME );
 	std::list <std::string> cleanWordsList = TextFormatter::deleteStopWords( stopWordsList, wordsList );
 
-	//WordGraph wordGraph(cleanWordsList);
-	//wordGraph.generateGraph();
-	//wordGraph.getPowerWords(POWER_WORDS_QUANTITY);
+	// std::cout << "Quantity of words " << wordsList.size() << std::endl;
+	// std::cout << "Quantity of stop words " << stopWordsList.size() << std::endl;
+	std::cout << "Quantity of clean words " << cleanWordsList.size() << std::endl;
+	
+	std::unordered_map <std::string, int> appereances;
+	for (auto const &word : cleanWordsList) {
+		appereances[word]++;
+	}
 
-	std::cout << "Hello World!" << std::endl;
+	// testing
+	std::unordered_map<std::string, int>::iterator it = appereances.begin();
+	while (it != appereances.end()) {
+		if (it->second > 10)
+			std::cout << it->first << " : " << it->second << std::endl;
+		it++;
+	}
+
+	//TextFormatter::showList(cleanWordsList);
 
 	return EXIT_SUCCESS;
 }

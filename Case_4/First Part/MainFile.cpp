@@ -15,14 +15,16 @@
 #include <unordered_map>
 
 #include "TextFormatter.cpp" 
-//#include "PowerRelationsGraph.cpp"
 #include "WordNode.cpp"
 
 #define POWER_WORDS_QUANTITY 10
-#define FILENAME 		    "TextToAnalize.txt"   				// "FirstParagraph.txt"
-#define STOPWORDS_FILENAME   "StopWords(SPANISH).txt"
+#define COMPLETE_TEXT_FILENAME "TextToAnalize.txt" 		
+#define FIRST_PARAGRAPH_FILENAME "FirstParagraph.txt" 
 
 // StopWords file getted from: https://github.com/Alir3z4/stop-words/blob/master/spanish.txt
+
+void showSentences(std::string);
+void showWords(std::string);
 
 int main() {
 
@@ -44,11 +46,32 @@ int main() {
 				las relaciones de poder, cantidad de apariciones, palabras mas poderosas, cuales palabras se relacion
 				en mayor y menor cantidad,etc.
 	*/
-
-	//std::list <std::string> wordsList = TextFormatter::getWordsListFromFile( FILENAME );
-	//std::list <std::string> stopWordsList = TextFormatter::getWordsListFromFile( STOPWORDS_FILENAME );
-	//std::list <std::string> cleanWordsList = TextFormatter::deleteStopWords( stopWordsList, wordsList );
-	//TextFormatter::showList(cleanWordsList);
+	showSentences(FIRST_PARAGRAPH_FILENAME);
 
 	return EXIT_SUCCESS;
+} 
+
+void showWords(std::string filename) {
+	
+	std::list<std::string> wordsBag = TextFormatter::getWordsFromFile(filename);
+	int counter = 0;
+	for (auto const &word: wordsBag){
+		std::cout << counter << ":" << word << std::endl;
+		counter++;
+	}
+	std::cout << " Palabras limpias: " << counter << std::endl;
 }
+
+void showSentences(std::string filename){
+
+	std::list< std::list<std::string>> sentencesBag = TextFormatter::getSentencesFromFile(filename);
+	for (auto const &sentence: sentencesBag){
+		std::cout << "Oracion con " << sentence.size() << " palabras: " << "{ " << std::endl;
+		for (auto const &word : sentence){
+			std::cout << word << std::endl;
+		}
+		std::cout << " }\n\n\n";
+	}
+	std::cout<< "Oraciones encontradas: " << sentencesBag.size() << std::endl;
+}
+

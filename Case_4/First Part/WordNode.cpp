@@ -15,18 +15,20 @@ public:
 		this->word = word;
 	}
 
-	std::list<pair<int, std::string>> getRelatedWords(int quantity);
-	void addRelation(std::string word, int arcWeight = 1);
+	std::list<std::pair<int, std::string>> getRelatedWords(int quantity);
+	void addRelation(std::string word, int arcWeight);
 	bool existRelation (std::string anotherWord);
 
 };
 
-std::list<pair<int, std::string>> WordNode::getRelatedWords(int quantity = relations.size()) {
+std::list<std::pair<int, std::string>> WordNode::getRelatedWords(int quantity) {
 	/* 
 		Objectivo: dada sus relaciones obtener la cantidad de palabras pedidas por parametro
 
 		Complejidad esperada: O(n)
 	*/
+	std::list<pair<int, std::string>> listReturned;
+	return listReturned;
 }
 
 void WordNode::addRelation(std::string word, int arcWeight = 1) {

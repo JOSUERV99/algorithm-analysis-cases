@@ -10,12 +10,14 @@
 #include <string>
 #include <locale>
 #include <list>
+#include <map>
 #include <algorithm>
 #include <stdio.h>
 #include <unordered_map>
 
+//#include "WordNode.cpp"
 #include "TextFormatter.cpp" 
-#include "WordNode.cpp"
+#include "PowerRelationsGraph.cpp"
 
 #define POWER_WORDS_QUANTITY 10
 #define COMPLETE_TEXT_FILENAME "TextToAnalize.txt" 		
@@ -46,7 +48,10 @@ int main() {
 				las relaciones de poder, cantidad de apariciones, palabras mas poderosas, cuales palabras se relacion
 				en mayor y menor cantidad,etc.
 	*/
-	showSentences(FIRST_PARAGRAPH_FILENAME);
+
+	std::list<std::string> wordsGetted = TextFormatter::getWordsFromFile(FIRST_PARAGRAPH_FILENAME);
+	PowerRelationsGraph prGraph = PowerRelationsGraph(wordsGetted);
+	prGraph.showGraph(20);
 
 	return EXIT_SUCCESS;
 } 

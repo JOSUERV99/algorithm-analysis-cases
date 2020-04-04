@@ -14,12 +14,12 @@
 #include <algorithm>
 #include <stdio.h>
 #include <unordered_map>
+#include <algorithm>
 
 //#include "WordNode.cpp"
 #include "TextFormatter.cpp" 
 #include "PowerRelationsGraph.cpp"
 
-#define POWER_WORDS_QUANTITY 10
 #define COMPLETE_TEXT_FILENAME "TextToAnalize.txt" 		
 #define FIRST_PARAGRAPH_FILENAME "FirstParagraph.txt" 
 
@@ -30,8 +30,7 @@ void showWords(std::string);
 
 int main() {
 
-	/*
-		Idea de trabajo:
+	/* Idea de trabajo:
 			1. Extraer las palabras descartando caracteres innecesarios
 			2. Eliminar palabras repetitivas (StopWords)
 			3. Generar el grafo, registrando sus apariciones y las relaciones como un arco donde el peso
@@ -43,15 +42,14 @@ int main() {
 				(Nota: las relaciones de cada palabra se crearan dentro de un mapa o "tabla hash" al igual
 					que el grafo de cada una de ellas, dando como resultado, una mapa de palabras y cada una de 
 					ellas con su mapa de relaciones con las otras, como un grafo)
-			4. Una vex dada la precarga del grafo de palabras (recorrido y creacion de relaciones de las palabras del texto),
+			4. Una vez dada la precarga del grafo de palabras (recorrido y creacion de relaciones de las palabras del texto),
 				se podran ejecutar consultas a este para obtener
 				las relaciones de poder, cantidad de apariciones, palabras mas poderosas, cuales palabras se relacion
-				en mayor y menor cantidad,etc.
-	*/
+				en mayor y menor cantidad,etc. */
 
-	std::list<std::string> wordsGetted = TextFormatter::getWordsFromFile(FIRST_PARAGRAPH_FILENAME);
-	PowerRelationsGraph prGraph = PowerRelationsGraph(wordsGetted);
-	prGraph.showGraph(20);
+	//auto wordsGetted = TextFormatter::getWordsFromFile(FIRST_PARAGRAPH_FILENAME);
+	auto sentencesGetted = TextFormatter::getSentencesFromFile(FIRST_PARAGRAPH_FILENAME);
+	PowerRelationsGraph prGraph(sentencesGetted);
 
 	return EXIT_SUCCESS;
 } 

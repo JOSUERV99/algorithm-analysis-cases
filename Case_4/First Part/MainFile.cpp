@@ -16,7 +16,6 @@
 #include <unordered_map>
 #include <algorithm>
 
-//#include "WordNode.cpp"
 #include "TextFormatter.cpp" 
 #include "PowerRelationsGraph.cpp"
 
@@ -37,7 +36,7 @@ int main() {
 				representa las veces que se han relacionado esas dos palabras. La relacion entre las dos
 				se hara tomando en cuenta alguna de estas alternativas:
 					3.1 Palabra anterior y consecutiva
-					3.2 Palabras dentro de la misma oracion
+					3.2 Palabras dentro de la misma oracion ###
 					3.3 Palabras dentro del mismo parrafo
 				(Nota: las relaciones de cada palabra se crearan dentro de un mapa o "tabla hash" al igual
 					que el grafo de cada una de ellas, dando como resultado, una mapa de palabras y cada una de 
@@ -47,9 +46,13 @@ int main() {
 				las relaciones de poder, cantidad de apariciones, palabras mas poderosas, cuales palabras se relacion
 				en mayor y menor cantidad,etc. */
 
-	//auto wordsGetted = TextFormatter::getWordsFromFile(FIRST_PARAGRAPH_FILENAME);
-	auto sentencesGetted = TextFormatter::getSentencesFromFile(FIRST_PARAGRAPH_FILENAME);
-	PowerRelationsGraph prGraph(sentencesGetted);
+	//auto data = TextFormatter::getWordsFromFile(COMPLETE_TEXT_FILENAME);
+	auto data = TextFormatter::getSentencesFromFile(COMPLETE_TEXT_FILENAME);
+	PowerRelationsGraph prGraph(data);
+
+	std::list<WordNode> powerWords = prGraph.getPowerWords(5);
+	for (auto const &pWord: powerWords)
+		std::cout << pWord << std::endl;
 
 	return EXIT_SUCCESS;
 } 

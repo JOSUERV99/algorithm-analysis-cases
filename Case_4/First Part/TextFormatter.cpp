@@ -14,8 +14,8 @@ namespace TextFormatter {
 		std::ifstream reader (filename, std::ifstream::in);
 		std::list <std::string> wordList; 
 		std::string text = "";
+		
 		char characterReaded;
-
 		while (reader.good()) {
 
 			characterReaded = reader.get();

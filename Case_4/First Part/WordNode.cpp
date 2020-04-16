@@ -25,11 +25,14 @@ public:
 			"Word: " << object.word << std::endl <<
 			"Relations: " << object.relations.size() << std::endl;
 
-		for (auto const &relation: object.relations)
-			o << "\tRel.Word: " << relation.first << std::endl <<
-				 "\tTimes: " << relation.second << std::endl;
+		int counter = 0;
+		for (auto const &relation: object.relations) {
+			o << "{" << relation.first << "," << relation.second << "}, ";
+			if (counter != 0 && counter%4 == 0)
+				o << "\n";
+		}
 		
-		o << "Appearances:" << object.appearances << std::endl <<
+		o << "\n\nAppearances:" << object.appearances << std::endl <<
 			"Score: "<< object.points << " pts" << std::endl <<
 		"***********************" << std::endl;
 		return o;
@@ -49,7 +52,7 @@ void WordNode::processRelation(std::string nearWord) {
 	} else {
 		relations.at( nearWord )++;
 	}
-
+	points++;
 }
 
 std::list<std::pair<int, std::string>> WordNode::getRelatedWords(int quantity) {

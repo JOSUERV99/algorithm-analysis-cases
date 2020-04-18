@@ -6,13 +6,6 @@
 
 class PowerRelationsGraph {
 public:
-
-	// struct WordNodeComparator {
- //     	bool operator()(const std::string& left, const string& right) {
- //       		return getNode(left).points < getNode(right).points;
- //     	}
-	// };
-
 	std::unordered_map <std::string, WordNode> wordsMap;
 	std::list<std::string> wordsBag;
 	std::list<std::list<std::string>> sentencesBag;
@@ -30,7 +23,8 @@ private:
 	void createWordNodes(std::list< std::string >);
 	void showGraph(int);
 
-	std::vector<WordNode> sortWordNodesByPoints();
+	std::vector<WordNode> sortWordNodesByPoints_Counting();
+	std::vector<WordNode> sortWordNodesByPoints_Quick();
 	void generateWordsGraph();
 	void generateSentenceGraph();
 	void addEveryWordAtSentences(std::list <std::list <std::string>>);
@@ -41,7 +35,71 @@ bool WordNodeComparator(WordNode a, WordNode b) {
 	return a.points < b.points;
 }
 
-std::vector<WordNode> PowerRelationsGraph::sortWordNodesByPoints() {
+std::vector<WordNode> PowerRelationsGraph::sortWordNodesByPoints_Quick() {
+
+	// obtenemos los nodos a ordenar
+	std::vector<WordNode> arr;
+	for (auto const &pair: wordsMap) // O(n)
+		arr.push_back(pair.second);
+
+	// QUICKSORT
+	int l = 0, h = arr.size();
+	// Create an auxiliary stack 
+    int stack[h - l + 1]; 
+  
+    // initialize top of stack 
+    int top = -1; 
+  
+    // push initial values of l and h to stack 
+    stack[++top] = l; 
+    stack[++top] = h; 
+  
+    // Keep popping from stack while is not empty 
+    while (top >= 0) { 
+        // Pop h and l 
+        h = stack[top--]; 
+        l = stack[top--]; 
+  
+        // Set pivot element at its correct position 
+        // in sorted array 
+        int x = arr[h].points; 
+	    int i = (l - 1); 
+	  
+	    for (int j = l; j <= h - 1; j++) { 
+	        if (arr[j].points <= x) { 
+	            i++; 
+	            int aux = arr[i].points;
+	            arr[i].points = arr[j].points;
+	            arr[j].points = aux;
+	        } 
+	    } 
+
+	    int aux = arr[i + 1].points;
+	    arr[i + 1].points = arr[h].points;
+	    arr[h].points = aux;
+
+        int p = (i + 1); 
+  
+        // If there are elements on left side of pivot, 
+        // then push left side to stack 
+        if (p - 1 > l) { 
+            stack[++top] = l; 
+            stack[++top] = p - 1; 
+        } 
+  
+        // If there are elements on right side of pivot, 
+        // then push right side to stack 
+        if (p + 1 < h) { 
+            stack[++top] = p + 1; 
+            stack[++top] = h; 
+        } 
+    } 
+
+    return arr;
+}
+
+
+std::vector<WordNode> PowerRelationsGraph::sortWordNodesByPoints_Counting() {
 
 	/*	Objetivo: usar counting sort para generar una lista precarga de los 
 		nodos de palabra ordenados por la cantidad de puntos de poder
@@ -89,7 +147,7 @@ PowerRelationsGraph::PowerRelationsGraph(std::list <std::list <std::string>> sen
 	addEveryWordAtSentences(sentencesListFromFile);
 	sentencesBag = sentencesListFromFile;
 	preloadGraph();
-	sortedListForQueries = sortWordNodesByPoints();
+	sortedListForQueries = sortWordNodesByPoints_Quick();
 }
 
 void PowerRelationsGraph::addEveryWordAtSentences(std::list <std::list <std::string>> sentencesListFromFile) {
@@ -187,14 +245,12 @@ void PowerRelationsGraph::generateWordsGraph() {
 }
 
 void PowerRelationsGraph::generateSentenceGraph() {
-	/* 	Objectivo: Obtener las C palabras más poderosas del texto, siendo C un entero variable.
-		
-		Procedimiento: retornar de la lista precargada una lista con c elementos 
-			indicando cuales son las palabras mas poderosas, recorriendo cada una de las palabras 
-			para encontrar las palabras mas relacionadas o poderosas.
 
-		Complejidad esperada: O(n) 
-		Complejidad obtenida: O(n^2) */
+	/* 	Objectivo: relacionar cada una de las palabras de cada oracion con cada una de las 
+			palabras dentro de la misma oracion, exceptuando ella misma
+
+	Complejidad esperada: O(n) 
+	Complejidad obtenida: O(n^2) */
 
 	for (auto const &sentence : sentencesBag)
 		for (auto const &word : sentence) 

@@ -30,6 +30,7 @@ public:
 			o << "{" << relation.first << "," << relation.second << "}, ";
 			if (counter != 0 && counter%4 == 0)
 				o << "\n";
+			counter++;
 		}
 		
 		o << "\n\nAppearances:" << object.appearances << std::endl <<

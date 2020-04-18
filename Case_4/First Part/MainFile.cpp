@@ -1,8 +1,6 @@
 
 /* 
 	[ author: Josue Rojas Vega ]
-		Borrador de codigo para la generacion del grafo de relaciones de poder a partir del texto dado 
-		Idea para la generacion del algoritmo
 */
 
 #include <iostream>
@@ -50,7 +48,7 @@ int main() {
 	auto data = TextFormatter::getSentencesFromFile(COMPLETE_TEXT_FILENAME);
 	PowerRelationsGraph prGraph(data);
 
-	std::list<WordNode> powerWords = prGraph.getPowerWords(5);
+	std::list<WordNode> powerWords = prGraph.getPowerWords(15);
 	for (auto const &pWord: powerWords)
 		std::cout << pWord << std::endl;
 

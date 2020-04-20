@@ -10,7 +10,7 @@ public:
 	std::unordered_map <std::string, int> relations;
 	int appearances, points;
 
-	WordNode(std::string word){
+	WordNode(std::string word) {
 		this->word = word;
 		this->appearances = this->points = 1;
 	}
@@ -27,10 +27,12 @@ public:
 
 		int counter = 0;
 		for (auto const &relation: object.relations) {
-			o << "{" << relation.first << "," << relation.second << "}, ";
-			if (counter != 0 && counter%4 == 0)
-				o << "\n";
-			counter++;
+			if (relation.second > 1) { // *****************************
+				o << "{" << relation.first << "," << relation.second << "}, ";
+				if (counter != 0 && counter%4 == 0)
+					o << "\n";
+				counter++;
+			}
 		}
 		
 		o << "\n\nAppearances:" << object.appearances << std::endl <<

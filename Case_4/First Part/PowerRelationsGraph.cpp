@@ -23,19 +23,18 @@ private:
 	void createWordNodes(std::list< std::string >);
 	void showGraph(int);
 
-	std::vector<WordNode> sortWordNodesByPoints_Counting();
-	std::vector<WordNode> sortWordNodesByPoints_Quick();
+	std::vector<WordNode> sortWordNodesByPoints();
 	void generateWordsGraph();
 	void generateSentenceGraph();
 	void addEveryWordAtSentences(std::list <std::list <std::string>>);
-	
+	void createRelationsMatrix();
 };
 
 bool WordNodeComparator(WordNode a, WordNode b) {
 	return a.points < b.points;
 }
 
-std::vector<WordNode> PowerRelationsGraph::sortWordNodesByPoints_Quick() {
+std::vector<WordNode> PowerRelationsGraph::sortWordNodesByPoints() {
 
 	// obtenemos los nodos a ordenar
 	std::vector<WordNode> arr;
@@ -68,15 +67,15 @@ std::vector<WordNode> PowerRelationsGraph::sortWordNodesByPoints_Quick() {
 	    for (int j = l; j <= h - 1; j++) { 
 	        if (arr[j].points <= x) { 
 	            i++; 
-	            int aux = arr[i].points;
-	            arr[i].points = arr[j].points;
-	            arr[j].points = aux;
+	            WordNode aux = arr[i];
+	            arr[i] = arr[j];
+	            arr[j] = aux;
 	        } 
 	    } 
 
-	    int aux = arr[i + 1].points;
-	    arr[i + 1].points = arr[h].points;
-	    arr[h].points = aux;
+	    WordNode aux = arr[i + 1];
+	    arr[i + 1] = arr[h];
+	    arr[h] = aux;
 
         int p = (i + 1); 
   
@@ -98,44 +97,6 @@ std::vector<WordNode> PowerRelationsGraph::sortWordNodesByPoints_Quick() {
     return arr;
 }
 
-
-std::vector<WordNode> PowerRelationsGraph::sortWordNodesByPoints_Counting() {
-
-	/*	Objetivo: usar counting sort para generar una lista precarga de los 
-		nodos de palabra ordenados por la cantidad de puntos de poder
-	
-	Complejidad esperada O(n+k) 	n=cantidad de nodos 	k=tamanio de array auxiliar (rango entre menor y mayor)
-	*/
-
-	// obtenemos los nodos a ordenar
-	std::vector<WordNode> arr;
-
-	for (auto const &pair: wordsMap) // O(n)
-		arr.push_back(pair.second);
-
-	// preparamos el array auxiliar para el conteo
-    int max = (*max_element(arr.begin(), arr.end(), WordNodeComparator)).points; 
-    int min = (*min_element(arr.begin(), arr.end(), WordNodeComparator)).points; 
-    int range = max - min + 1; 
-      
-    vector<int> count(range), output(arr.size()); 
-    for(int i = 0; i < arr.size(); i++) 
-        count[arr[i].points -min]++; 
-          
-    for(int i = 1; i < count.size(); i++) 
-           count[i] += count[i-1]; 
-    
-    for(int i = arr.size()-1; i >= 0; i--) {  
-        output[ count[arr[i].points-min] -1 ] = arr[i].points;  
-        count[arr[i].points-min]--;  
-    } 
-      
-    for(int i=0; i < arr.size(); i++) 
-        arr[i].points = output[i]; 
-
-    return arr;
-}
-
 PowerRelationsGraph::PowerRelationsGraph(std::list <std::string> wordsListFromFile) {
 	this->mode = WORD_MODE;
 	wordsBag = wordsListFromFile;
@@ -147,7 +108,7 @@ PowerRelationsGraph::PowerRelationsGraph(std::list <std::list <std::string>> sen
 	addEveryWordAtSentences(sentencesListFromFile);
 	sentencesBag = sentencesListFromFile;
 	preloadGraph();
-	sortedListForQueries = sortWordNodesByPoints_Quick();
+	sortedListForQueries = sortWordNodesByPoints();
 }
 
 void PowerRelationsGraph::addEveryWordAtSentences(std::list <std::list <std::string>> sentencesListFromFile) {
@@ -244,6 +205,16 @@ void PowerRelationsGraph::generateWordsGraph() {
 	}
 }
 
+void PowerRelationsGraph::createRelationsMatrix() {
+	/*
+		TODO: crear matriz de relaciones de las palabras y escribirlo dentro de un archivo txt
+			como una gran tabla para la busqueda de un patron a seguir para encontrar los grupos de poder
+
+		Complejidad esperada: O(n)
+	*/
+
+}
+
 void PowerRelationsGraph::generateSentenceGraph() {
 
 	/* 	Objectivo: relacionar cada una de las palabras de cada oracion con cada una de las 
@@ -268,10 +239,8 @@ std::list<WordNode> PowerRelationsGraph::getPowerWords(int c) {
 			indicando cuales son las palabras mas poderosas, recorriendo cada una de las palabras 
 			para encontrar las palabras mas relacionadas o poderosas.
 		
-		Complejidad esperada: O(n) 
-		Complejidad obtenida: O(c) 
-
-	*/
+	Complejidad esperada: O(n) 
+	Complejidad obtenida: O(c)  */
 
 	std::list<WordNode> powerWords;
 

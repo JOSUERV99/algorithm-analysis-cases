@@ -2,16 +2,15 @@
 /* 
 	[ author: Josue Rojas Vega ]
 */
-
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <locale>
 #include <list>
 #include <algorithm>
 #include <stdio.h>
 #include <unordered_map>
 #include <algorithm>
+#include <ctype.h>
 
 #include "TextFormatter.cpp" 
 #include "PowerRelationsGraph.cpp"
@@ -23,6 +22,7 @@
 
 void showSentences(std::string);
 void showWords(std::string);
+void showWordsFromList(std::list<WordNode>);
 
 int main() {
 
@@ -44,15 +44,22 @@ int main() {
 				en mayor y menor cantidad,etc. */
 
 	//auto data = TextFormatter::getWordsFromFile(COMPLETE_TEXT_FILENAME);
-	auto data = TextFormatter::getSentencesFromFile(COMPLETE_TEXT_FILENAME);
-	PowerRelationsGraph prGraph(data);
+	//auto data = TextFormatter::getSentencesFromFile(COMPLETE_TEXT_FILENAME);
+	// PowerRelationsGraph prGraph(data);
 
-	std::list<WordNode> powerWords = prGraph.getPowerWords(15);
-	for (auto const &pWord: powerWords)
-		std::cout << pWord << std::endl;
+	std::list< std::string > words = TextFormatter::getSentencesFromFile(COMPLETE_TEXT_FILENAME);
+
+	// std::list<WordNode> powerWords = prGraph.getPowerWords(15);
+	// showWordsFromList(powerWords);
+
 
 	return EXIT_SUCCESS;
 } 
+
+void showWordsFromList(std::list<WordNode> wordList){
+	for (auto const &pWord: wordList)
+		std::cout << pWord << std::endl;
+}
 
 void showWords(std::string filename) {
 	

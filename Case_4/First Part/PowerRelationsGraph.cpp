@@ -9,24 +9,21 @@ public:
 	std::unordered_map <std::string, WordNode> wordsMap;
 	std::list<std::string> wordsBag;
 	std::list<std::list<std::string>> sentencesBag;
-
+	int wordsAmount;
 	std::vector<WordNode> sortedListForQueries;
-	int mode;
 
-	PowerRelationsGraph(std::list <std::string>);
+	PowerRelationsGraph(std::list <std::string>, int);
 	PowerRelationsGraph(std::list <std::list <std::string>>);
 	bool existsRelationBetweenTwoWords(std::string, std::string);
+	
 	std::list<WordNode> getPowerWords(int);
-
+	std::list<std::list<WordNode>> getPowerGroups(std::string, int);
 private:
-	void preloadGraph();
 	void createWordNodes(std::list< std::string >);
 	void showGraph(int);
 
 	std::vector<WordNode> sortWordNodesByPoints();
-	void generateWordsGraph();
 	void generateSentenceGraph();
-	void addEveryWordAtSentences(std::list <std::list <std::string>>);
 	void createRelationsMatrix();
 };
 
@@ -97,24 +94,11 @@ std::vector<WordNode> PowerRelationsGraph::sortWordNodesByPoints() {
     return arr;
 }
 
-PowerRelationsGraph::PowerRelationsGraph(std::list <std::string> wordsListFromFile) {
-	this->mode = WORD_MODE;
-	wordsBag = wordsListFromFile;
-	preloadGraph();
-}
+PowerRelationsGraph::PowerRelationsGraph(std::list <std::list <std::string>> sentencesListFromFile, int amount) {
 
-PowerRelationsGraph::PowerRelationsGraph(std::list <std::list <std::string>> sentencesListFromFile) {
-	this->mode = SENTENCE_MODE;
-	addEveryWordAtSentences(sentencesListFromFile);
 	sentencesBag = sentencesListFromFile;
-	preloadGraph();
+	generateSentenceGraph();
 	sortedListForQueries = sortWordNodesByPoints();
-}
-
-void PowerRelationsGraph::addEveryWordAtSentences(std::list <std::list <std::string>> sentencesListFromFile) {
-	for (auto const &sentence: sentencesListFromFile)
-		for (auto const &word: sentence)
-			wordsBag.push_back(word);
 }
 
 void PowerRelationsGraph::showGraph(int quantity=0) {
@@ -137,26 +121,6 @@ bool PowerRelationsGraph::existsRelationBetweenTwoWords(std::string word, std::s
 	if (wordsMap.count(word) == 1)
 		return wordsMap.at(word).existRelation(anotherWord);
 	return false;
-}
-
-void PowerRelationsGraph::preloadGraph() {
-
-	/*  Objectivo: tomar cada palabra y establecer cada una de las relaciones, tomando en cuenta si hasta
-		ese momento existe relacion entre la palabra dada y alguna otra ya existente
-
-	Complejidad esperada: O(n) 
-	Complejidad obtenida: O(nlog2(n)) */
-	
-	createWordNodes(wordsBag);
-
-	if (mode == WORD_MODE) {	
-		generateWordsGraph();	
-	} else if (mode == SENTENCE_MODE) {
-		generateSentenceGraph();
-	}
-
-	/* testing graph */
-	//showGraph();
 }
 
 void PowerRelationsGraph::createWordNodes(std::list< std::string > words) {
@@ -205,30 +169,32 @@ void PowerRelationsGraph::generateWordsGraph() {
 	}
 }
 
-void PowerRelationsGraph::createRelationsMatrix() {
-	/*
-		TODO: crear matriz de relaciones de las palabras y escribirlo dentro de un archivo txt
-			como una gran tabla para la busqueda de un patron a seguir para encontrar los grupos de poder
-
-		Complejidad esperada: O(n)
-	*/
-
-}
-
 void PowerRelationsGraph::generateSentenceGraph() {
 
 	/* 	Objectivo: relacionar cada una de las palabras de cada oracion con cada una de las 
 			palabras dentro de la misma oracion, exceptuando ella misma
 
-	Complejidad esperada: O(n) 
-	Complejidad obtenida: O(n^2) */
+		// Criterio de relacion dentro de la oracion (Cadena)
 
-	for (auto const &sentence : sentencesBag)
-		for (auto const &word : sentence) 
-			for (auto const otherWord : sentence) 
-				if (word != otherWord) 
-					wordsMap.at(word).processRelation(otherWord);
-				
+		Oracion de ejemplo:
+			"Un gran número sacerdotes primitivos pertenecían clase denominado paranoica"
+
+		Un -> <- gran -> <- numero -> <- sacerdotes -> <- primitivos ->
+		
+	Complejidad esperada: O(n) 
+	Complejidad obtenida: O(n) */	
+
+	for (auto const &sentence : sentencesBag) {
+		// TODO: usar iteradores para acceder a palabras consecutivas
+	}		
+}
+
+std::list< std::list<WordNode> > getPowerGroups(std::string word, int groupsAmount) {
+
+	std::list< std::list<WordNode> > groups;
+
+	return groups;
+
 }
 
 std::list<WordNode> PowerRelationsGraph::getPowerWords(int c) {

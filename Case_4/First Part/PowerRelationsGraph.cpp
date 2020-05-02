@@ -1,5 +1,4 @@
 #include "WordNode.cpp"
-#include <vector>
 
 #define SENTENCE_MODE 1
 #define WORD_MODE 0
@@ -9,13 +8,19 @@ public:
 	std::unordered_map <std::string, WordNode> wordsMap;
 	std::list<std::string> wordsBag;
 	std::list<std::list<std::string>> sentencesBag;
-	int wordsAmount;
 	std::vector<WordNode> sortedListForQueries;
+	int wordsAmount;
 
-	PowerRelationsGraph(std::list <std::string>, int);
 	PowerRelationsGraph(std::list <std::list <std::string>>);
+
+	PowerRelationsGraph(std::list <std::list <std::string>> sentencesListFromFile, int amount) {
+		sentencesBag = sentencesListFromFile;
+		generateSentenceGraph();
+		sortedListForQueries = sortWordNodesByPoints();
+	}
+
+	void generateWordsGraph();
 	bool existsRelationBetweenTwoWords(std::string, std::string);
-	
 	std::list<WordNode> getPowerWords(int);
 	std::list<std::list<WordNode>> getPowerGroups(std::string, int);
 private:
@@ -92,13 +97,6 @@ std::vector<WordNode> PowerRelationsGraph::sortWordNodesByPoints() {
     } 
 
     return arr;
-}
-
-PowerRelationsGraph::PowerRelationsGraph(std::list <std::list <std::string>> sentencesListFromFile, int amount) {
-
-	sentencesBag = sentencesListFromFile;
-	generateSentenceGraph();
-	sortedListForQueries = sortWordNodesByPoints();
 }
 
 void PowerRelationsGraph::showGraph(int quantity=0) {

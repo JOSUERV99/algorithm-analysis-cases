@@ -1,41 +1,18 @@
 #define DELIMITER '.' // for sentence mode
-#define STOPWORDS_FILENAME "StopWords(SPANISH).txt"
 
 namespace TextFormatter {
 
-	std::list <std::string> getWordListFromFile(std::string filename) {
+	bool wordAccepted(std::string word) {
+		// @param word debe tener al menos 4 caracteres
+		// criterio segun generalizacion de atributos que normalmente se asocian a los sustantivos
+		// O(c)
 
-		/* 
-			Objetivo: obtener caracter a caracter el contenido del archivo de texto, 
-			usada par obtener las "stopWords" para tener una mejor fuente de palabras
-
-		Complejidad obtenida: O(n) siendo n la cantidad de caracteres
-		*/
-
-		std::ifstream reader (filename, std::ifstream::in);
-		std::list <std::string> wordList;
-		char characterReaded;
-
-		while (reader.good()) {
-
-			std::string text = "";
-
-			characterReaded = reader.get();
-			while ( characterReaded && characterReaded != EOF && !isspace(characterReaded) 
-						&& !ispunct(characterReaded) && !isdigit(characterReaded)) {
-				
-				text += characterReaded;
-				characterReaded = reader.get();
-			}
-			
-			if (text != "") {
-				transform(text.begin(), text.end(), text.begin(), ::tolower);
-				wordList.push_back(text);
-			}
-		}
-
-		reader.close();
-		return wordList;
+		return 
+			word.size() > 4 &&
+			word[0] != 'e' && word[1] != 's' && // empieza con 'es'
+			word[0] != 'h' && // empieza con h y sigue a, e, o
+				(word[1] != 'a' || word[1] != 'u' || word[1] != 'e') && 
+			word[word.size()-1] != 'r' && word[word.size()-1] != 's'; // termina en r
 	}
 
 	std::list < std::list <std::string> > readSentencesListFromFile(std::string filename) {
@@ -55,20 +32,25 @@ namespace TextFormatter {
 
 		while (reader.good()) {
 			
-			characterReaded = reader.get();
-			while ( characterReaded && characterReaded != DELIMITER 
-				&& characterReaded != EOF && !isspace(characterReaded) && !isdigit(characterReaded) && !ispunct(characterReaded)) {
+			characterReaded = tolower(reader.get());
+			while ( characterReaded && 
+					characterReaded != DELIMITER 
+					&& characterReaded != EOF && 
+					!isspace(characterReaded) && 
+					!isdigit(characterReaded) && 
+					!ispunct(characterReaded)
+				) {
 				text += characterReaded;
 				characterReaded = reader.get();
 			}
 			
 			if (text != "") {
-				transform(text.begin(), text.end(), text.begin(), ::tolower);
-				currentSentence.push_back(text);
+				if (wordAccepted(text))
+					currentSentence.push_back(text);
 				text = "";
 			}
 
-			if (characterReaded == DELIMITER) {
+			if (characterReaded == DELIMITER) { // end of the sentence
 				if (currentSentence.size() > 1)
 					sentenceList.push_back(currentSentence);
 				currentSentence.clear();	
@@ -78,58 +60,4 @@ namespace TextFormatter {
 		reader.close();
 		return sentenceList;
 	}
-
-	std::list <std::string> deleteStopWords(std::list <std::string> stopWordsList, std::list <std::string> sentence) {
-
-		/* 
-			Objetivo: descartar las palabras "stop" dentro del conjunto de oraciones
-
-		Complejidad obtenida: O(n^2) siendo n la cantidad de palabras por oracion dada
-		*/
-
-		std::list <std::string> cleanWords;
-		
-		for (auto const &word: sentence) {
-			bool uselessWordFlag = false;
-			for (auto const &stopWord: stopWordsList)
-				if (stopWord == word) {
-					uselessWordFlag = true;
-					break;
-				}
-
-			if (!uselessWordFlag) {
-				cleanWords.push_back(word);
-			}
-		}
-
-		return cleanWords;
-	}
-
-	std::list < std::list<std::string> > getSentencesFromFile(std::string filename) {
-
-		// TODO:  ---n^3---
-
-		std::list < std::list<std::string> > sentencesWithoutStopWords;
-		std::list < std::list<std::string> > sentences = readSentencesListFromFile(filename); // O(n)
-		std::list < 	  std::string  	   > stopWordsList = getWordListFromFile( STOPWORDS_FILENAME ); // O(n)
-		
-		// O(n^3)
-		for (auto const &sentence: sentences) { // O(n)
-			std::list <std::string> simpleSentence = deleteStopWords(stopWordsList, sentence); // O(n^2)
-			if (simpleSentence.size() > 1)
-				sentencesWithoutStopWords.push_back(simpleSentence);
-		}
-
-		return sentencesWithoutStopWords;
-	}
-
-	std::list <std::string> getWordsFromFile(std::string filename) {
-
-		std::list<std::string> wordList = getWordListFromFile( filename );
-		std::list<std::string> stopWordsList = getWordListFromFile( STOPWORDS_FILENAME );
-		std::list<std::string> allWords =  deleteStopWords(stopWordsList, wordList);
-
-		return allWords;
-	}
-
 }

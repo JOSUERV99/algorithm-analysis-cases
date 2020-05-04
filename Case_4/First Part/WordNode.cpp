@@ -22,21 +22,21 @@ public:
 	
 	friend std::ostream& operator << (std::ostream &o,const WordNode &object) {
 		o << "***********************" << std::endl << 
-			"Word: " << object.word << std::endl <<
+			"Word: [" << object.word << "] " <<std::endl <<
 			"Relations: " << object.relations.size() << "\n\t";
 
 		int counter = 0;
-		for (auto const &relation: object.relations) {
-			if (relation.second > 0) { // *****************************
+		for (auto const &relation: object.relations) 
+			if (relation.second > 0) { 
 				o << "{" << relation.first << "," << relation.second << "}, ";
 				if (counter != 0 && counter % 4 == 0)
 					o << "\n\t";
 				counter++;
 			}
-		}
-		
+	
 		o << "\nAppearances:" << object.appearances << std::endl <<
-		"***********************" << std::endl;
+		"Available Words:" << object.availableWordsAmount <<
+		"\n***********************" << std::endl;
 		return o;
 	}
 };

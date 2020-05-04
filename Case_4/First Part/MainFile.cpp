@@ -18,6 +18,8 @@
 #define COMPLETE_TEXT_FILENAME "TextToAnalize.txt" 		
 #define FIRST_PARAGRAPH_FILENAME "FirstParagraph.txt" 
 
+using namespace Utils;
+
 int main() {
 
 	/* Idea de trabajo:
@@ -33,14 +35,19 @@ int main() {
 				las relaciones de poder, cantidad de apariciones, palabras mas poderosas, cuales palabras se relacion
 				en mayor y menor cantidad,etc. */
 
-	PowerRelationsGraph graph(COMPLETE_TEXT_FILENAME);
-	graph.generateSentenceGraph();
+	PowerRelationsGraph graph(COMPLETE_TEXT_FILENAME); 
+	graph.getReady(); // O(nlog(n))
 
+	// Querying for groups
 	std::string queryedWord = "sacerdote";
 	int requestedGroups = 4;
+	auto groups = graph.getPowerGroups( queryedWord, requestedGroups );
+	show( groups, queryedWord, requestedGroups );
 
-	auto groups = graph.getPowerGroups(queryedWord, requestedGroups);
-	Utils::show(groups, queryedWord, requestedGroups);
+	// Querying for power words
+	int requestedPowerWords = 2;
+	auto powerWords = graph.getPowerWords( requestedPowerWords );
+	show( powerWords );
 
 	return EXIT_SUCCESS;
 }

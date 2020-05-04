@@ -6,40 +6,90 @@
 
 class PowerRelationsGraph {
 public:
+	int wordsAmount;
+	std::string filename;
+	std::vector<WordNode> powerWords;
 	std::map <std::string, WordNode> wordsMap;
 	std::vector<std::vector<std::string>> sentencesBag;
-	int wordsAmount;
 	
+	PowerRelationsGraph(std::string filename) { this->filename = filename; wordsAmount = 0; } 
+
 	void getReady();
-	void generateSentenceGraph();
-	int getAvailableWordsAmount(WordNode &);
 	std::vector<WordNode> getPowerWords(int);
-	WordNode& processWordNode(std::string word, int); 
 	std::vector<std::vector<WordNode>> getPowerGroups(std::string, int);
 
-	PowerRelationsGraph(std::string filename) {
-		sentencesBag = TextFormatter::readSentencesListFromFile(filename);
-		wordsAmount = 0;
-	} 
-
 private:
-	void showGraph(int);	
+	void generateSentenceGraph();
+	void sortWordByAvailableNodes();
+	int getAvailableWordsAmount(WordNode &);
+	WordNode& processWordNode(std::string word, int); 
+	
+	std::vector<WordNode> _merge(std::vector<WordNode>, std::vector<WordNode>);
+	std::vector<WordNode> _mergeSort(std::vector<WordNode>, int);
 	std::vector<WordNode>& createGroup(std::string, std::vector<WordNode>&, std::string, int);
 };
 
-void PowerRelationsGraph::showGraph(int quantity = -1) {
-	
-	// metodo de prueba
-	if (quantity < 0)
-		quantity = wordsAmount;
+void PowerRelationsGraph::sortWordByAvailableNodes() {
 
-	std::cout << "Amount of words: " << wordsMap.size() << std::endl;
-	for (auto const &word : wordsMap) {
-		if (quantity-- <= 0)
-			break;
-		std::cout << word.second; // to show the wordNode
-		//std::cout << word.second.word << ": " << word.second.appearances << std::endl;
+	/* 	Objectivo: ordenar la palabras segun el valor de cantidad de nodos disponibles 
+	desde el nodo dado (Nota: ya calculado en processWordNode). [Merge Sort]
+	------------------------------------------------------------------------------------
+	Complejidad obtenida: O(nlog(n)) siendo n la cantidad de palabras */
+
+	std::cout << "Sorting " << powerWords.size() << " words" << std::endl;
+	powerWords = _mergeSort(powerWords, powerWords.size());
+
+}
+
+std::vector<WordNode> PowerRelationsGraph::_mergeSort(std::vector<WordNode> elementContainer, int size) {
+
+	/* Objetivo: (MERGE SORT) ordenar el vector de palabras reduciendo el problema por
+	la mitad en cada iteracion
+
+	Complejidad: O(nlog(n)) siendo n la cantidad de elementos a ordenar */	
+
+	if (size == 1) {
+		return elementContainer;
+	} else {
+
+		int middle = (size)/2;
+		std::vector<WordNode> firstPart = std::vector<WordNode>(elementContainer.begin(), elementContainer.begin()+middle);
+		std::vector<WordNode> secondPart = std::vector<WordNode>(elementContainer.begin()+middle+1, elementContainer.end());
+		
+		return _merge(firstPart, secondPart);
 	}
+}
+
+std::vector<WordNode> PowerRelationsGraph::_merge(std::vector<WordNode> subVector1, std::vector<WordNode> subVector2) {
+
+	/* Objetivo: (MERGE SORT) ordenar dos subvectores del vector original para las palabras
+	de poder. 
+
+	Complejidad: O(n) siendo n la cantidad de elementos a ordenar */
+
+	std::vector<WordNode> auxiliarVector;
+
+	while (!subVector1.empty() && !subVector2.empty()) {
+		if ( subVector1.front().availableWordsAmount > subVector2.front().availableWordsAmount ) {
+			auxiliarVector.push_back(subVector2.front());
+			subVector2.erase(subVector2.begin());
+		} else {
+			auxiliarVector.push_back(subVector1.front());
+			subVector1.erase(subVector1.begin());
+		}
+	}
+
+	while (!subVector1.empty()) {
+		auxiliarVector.push_back(subVector1.front());
+		subVector1.erase(subVector1.begin());
+	}
+
+	while (!subVector2.empty()) {
+		auxiliarVector.push_back(subVector2.front());
+		subVector2.erase(subVector2.begin());
+	}
+    
+	return auxiliarVector;
 }
 
 int PowerRelationsGraph::getAvailableWordsAmount(WordNode& pWordNode) {
@@ -50,10 +100,9 @@ int PowerRelationsGraph::getAvailableWordsAmount(WordNode& pWordNode) {
 	Complejidad obtenida: O(n) siendo n la cantidad de relaciones de la palabra dada */
 
 	int availableWordsAmount = 0;
-	for (auto const &relation : pWordNode.relations)
 
-	// O(log(n)) siendo n la cantidad de relaciones
-	availableWordsAmount += wordsMap.at(relation.first).availableWordsAmount;  
+	for (auto const &relation : pWordNode.relations)
+		availableWordsAmount += wordsMap.at(relation.first).availableWordsAmount;  
 
 	return availableWordsAmount;
 }
@@ -130,13 +179,16 @@ void PowerRelationsGraph::generateSentenceGraph() {
 	/* aprovechando que las palabras se encuentran en orden
 	 le damos un identificador con tal de sacar ventaja al saber si 
 	 es posterior a otra alfabeticamente posteriormente, ademas al haber 
-	 procesado cada una de las palabras 
+	 procesado cada una de las palabras. Tambien son agregadas a un vector 
+	 para luego ser usada para mostrar las c palabras poderosas del texto
 
 	Complejidad obtenida: O(n) siendo n la cantidad de palabras en el mapa */
 
 	int counter = 0;
-	for (auto &word: wordsMap) 
+	for (auto &word: wordsMap) {
+		this->powerWords.push_back(word.second);
 		word.second.mapIndex = counter++;
+	}
  
  }
 
@@ -147,6 +199,7 @@ std::vector<WordNode>& PowerRelationsGraph::createGroup(std::string theWord, std
 	else {
 		WordNode &currentWordNode =  wordsMap.at(key);
 		std::map< std::string, int > relations = currentWordNode.relations;
+		
 		auto choosedNode = (*relations.begin()).first == theWord ? relations.end() : ++relations.begin() ;
 		key = (choosedNode != relations.end()) ? (*choosedNode).first : "";
 		group.push_back( currentWordNode.word );
@@ -166,41 +219,41 @@ std::vector<std::vector<WordNode>> PowerRelationsGraph::getPowerGroups(std::stri
 	------------------------------------------------------------------------------------
 	Complejidad obtenida: .... TODO */
 
-	std::vector< std::vector<WordNode> > groups;
+	std::vector<std::vector<WordNode>> groups;
 
 	if (wordsMap.count(pWord) < 1) {
 		std::cout << "Palabra no encontrada" << std::endl;
-		return groups;
-	}
 
-	WordNode &pWordNode = wordsMap.at(pWord);
+	} else {
 
-	// calcula la cantidad de palabras por grupo a crear
-	//int availableWords = this->getAvailableWordsAmount(pWordNode);
-	int availableWords = pWordNode.availableWordsAmount;
-	int sizePerGroup = availableWords / kGroups;
+		WordNode &pWordNode = wordsMap.at(pWord);
 
-	auto relationsOfGivenWord = pWordNode.relations;
-	auto relationIter = relationsOfGivenWord.begin();
+		// calcula la cantidad de palabras por grupo a crear
+		//int availableWords = this->getAvailableWordsAmount(pWordNode);
+		int availableWords = pWordNode.availableWordsAmount;
+		int sizePerGroup = availableWords / kGroups;
 
-	int groupCounter = 0;
-	while ( kGroups != groupCounter++  && relationIter != relationsOfGivenWord.end() ) {
+		auto relationsOfGivenWord = pWordNode.relations;
+		auto relationIter = relationsOfGivenWord.begin();
 
-		std::string key = (*relationIter).first;
-		std::vector<WordNode> processedGroup;
-		std::vector<WordNode> newGroup = this->createGroup(key, processedGroup, key, sizePerGroup);
+		int groupCounter = 0;
+		while ( kGroups != groupCounter++  && relationIter != relationsOfGivenWord.end() ) {
 
-		if (newGroup.size() >= sizePerGroup) {
-			groups.push_back(newGroup);
+			std::string key = (*relationIter).first;
+			std::vector<WordNode> processedGroup;
+			this->createGroup(key, processedGroup, key, sizePerGroup);
+
+			if (processedGroup.size() == sizePerGroup)
+				groups.push_back(processedGroup);
+			
+			++relationIter;
 		}
-
-		++relationIter;
 	}
 
 	return groups;
 }
 
-std::vector<WordNode> PowerRelationsGraph::getPowerWords(int c) {
+std::vector<WordNode> PowerRelationsGraph::getPowerWords(int cWords) {
 	
 	/* 	Objectivo: Obtener las c palabras más poderosas del texto, siendo C un entero variable.
 		------------------------------------------------------------------------------------
@@ -208,12 +261,34 @@ std::vector<WordNode> PowerRelationsGraph::getPowerWords(int c) {
 			indicando cuales son las palabras mas poderosas, recorriendo cada una de las palabras 
 			para encontrar las palabras mas relacionadas o poderosas.
 	------------------------------------------------------------------------------------
-	Complejidad obtenida: O(c)  */
+	Complejidad obtenida: O(c) siendo c la cantidad de polabras a retornar*/
 
-	std::vector<WordNode> powerWords;
-	return powerWords;
+	std::vector<WordNode> wordsToReturn;
+
+	std::cout << "Here: " << powerWords.size() << std::endl;
+
+	if (cWords > powerWords.size())
+		return powerWords;
+
+	while (cWords > 0) {
+		wordsToReturn.push_back(powerWords[ cWords-- ]);
+	} 
+
+	return wordsToReturn;
 }
 
 void PowerRelationsGraph::getReady() {
-	// TODO: realizar el precargado de estructuras y demas aca
+	
+	// aloja el llamado de las funciones principales encargadas de generar el grafo y preparar
+	// antes de consultar: maxima complejidad O(nlog2(n))
+
+	// O(n) 
+	sentencesBag = TextFormatter::readSentencesListFromFile(filename); 
+
+	// O(nlog2(n))
+	generateSentenceGraph();    
+
+	 // O(nlog2(n))
+	sortWordByAvailableNodes();
+
 }

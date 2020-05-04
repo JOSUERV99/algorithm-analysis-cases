@@ -19,7 +19,8 @@ namespace TextFormatter {
 		if ( word[0] == 'h' && (word[1] == 'a' || word[1] == 'u' || word[1] == 'e'))
 			return false;
 
-		return word[0] != 'e' && word[1] != 's' && word[word.size()-1] != 'r' && word[word.size()-1] != 's';
+		return word[0] != 'e' && word[1] != 's' && word[word.size()-1] != 'r' && word[word.size()-1] != 's' &&  
+			word[word.size()-3] != 'n' &&  word[word.size()-2] != 'd' && word[word.size()-1] != 'n';
 	}
 
 	bool charAccepted(char characterReaded) {

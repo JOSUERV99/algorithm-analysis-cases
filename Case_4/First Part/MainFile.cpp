@@ -1,7 +1,6 @@
 
 /*  [ author: Josue Rojas Vega ]  */
 
-#include <iostream>
 #include <fstream>
 #include <string>
 #include <algorithm>
@@ -11,8 +10,10 @@
 #include <ctype.h>
 #include <vector>
 #include <unordered_map>
+#include <exception>
 
 #include "PowerRelationsGraph.cpp"
+#include "Utils.cpp"
 
 #define COMPLETE_TEXT_FILENAME "TextToAnalize.txt" 		
 #define FIRST_PARAGRAPH_FILENAME "FirstParagraph.txt" 
@@ -34,7 +35,12 @@ int main() {
 
 	PowerRelationsGraph graph(COMPLETE_TEXT_FILENAME);
 	graph.generateSentenceGraph();
-	graph.getPowerGroups("todopoderoso", 2);
+
+	std::string queryedWord = "sacerdote";
+	int requestedGroups = 4;
+
+	auto groups = graph.getPowerGroups(queryedWord, requestedGroups);
+	Utils::show(groups, queryedWord, requestedGroups);
 
 	return EXIT_SUCCESS;
 }

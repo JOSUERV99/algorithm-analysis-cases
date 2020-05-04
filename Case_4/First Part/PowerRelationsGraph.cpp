@@ -10,7 +10,9 @@ public:
 	std::vector<std::vector<std::string>> sentencesBag;
 	int wordsAmount;
 	
+	void getReady();
 	void generateSentenceGraph();
+	int getAvailableWordsAmount(WordNode &);
 	std::vector<WordNode> getPowerWords(int);
 	WordNode& processWordNode(std::string word, int); 
 	std::vector<std::vector<WordNode>> getPowerGroups(std::string, int);
@@ -21,7 +23,8 @@ public:
 	} 
 
 private:
-	void showGraph(int);
+	void showGraph(int);	
+	std::vector<WordNode>& createGroup(std::string, std::vector<WordNode>&, std::string, int);
 };
 
 void PowerRelationsGraph::showGraph(int quantity = -1) {
@@ -39,6 +42,22 @@ void PowerRelationsGraph::showGraph(int quantity = -1) {
 	}
 }
 
+int PowerRelationsGraph::getAvailableWordsAmount(WordNode& pWordNode) {
+
+	/* 	Objectivo: conocer la maxima cantidad de nodos accesibles desde el nodo de la
+	palabra p dada como parametro.
+	------------------------------------------------------------------------------------
+	Complejidad obtenida: O(n) siendo n la cantidad de relaciones de la palabra dada */
+
+	int availableWordsAmount = 0;
+	for (auto const &relation : pWordNode.relations)
+
+	// O(log(n)) siendo n la cantidad de relaciones
+	availableWordsAmount += wordsMap.at(relation.first).availableWordsAmount;  
+
+	return availableWordsAmount;
+}
+
 WordNode& PowerRelationsGraph::processWordNode(std::string word, int sentenceIndex) {
 
 	/* 	Objectivo: Sino existe agrega el nodo dentro del mapa de palabras, si existe aumenta 
@@ -48,7 +67,8 @@ WordNode& PowerRelationsGraph::processWordNode(std::string word, int sentenceInd
 	------------------------------------------------------------------------------------
 	Complejidad obtenida: O(log2(n)) siendo n la cantidad de palabras en el mapa */
 
-	if (!(wordsMap.count(word) > 1)) { // si no existe
+	if (wordsMap.count(word) <= 0) {
+
 		WordNode newWordNode = WordNode(word);
 		wordsMap.insert({word,newWordNode}); 
 
@@ -59,7 +79,7 @@ WordNode& PowerRelationsGraph::processWordNode(std::string word, int sentenceInd
 			currentWord.sentencesCodes.push_back(sentenceIndex);
 			currentWord.lastInsertedSentenceIndex = sentenceIndex;
 		
-			// calculando el numero de palabras accesibles desde este nodo
+			// calculando el numero de palabras accesibles del nodo actual
 			currentWord.availableWordsAmount += sentencesBag.at(sentenceIndex).size();
 		}
 	}
@@ -95,7 +115,7 @@ void PowerRelationsGraph::generateSentenceGraph() {
 			currentWordNode.processRelation(*wordIterator); // O(log2(n))
 
 			// siguiente palabra
-			std::advance(++wordIterator, 1); 						
+			std::advance(wordIterator, 2); 						
 			currentWordNode.processRelation(*wordIterator); // O(log2(n))
 
 			wordIterator = currentIt;
@@ -117,8 +137,23 @@ void PowerRelationsGraph::generateSentenceGraph() {
 	int counter = 0;
 	for (auto &word: wordsMap) 
 		word.second.mapIndex = counter++;
-	
-	return;
+ 
+ }
+
+std::vector<WordNode>& PowerRelationsGraph::createGroup(std::string theWord, std::vector<WordNode> &group, std::string key, int kAmount) {
+
+	if (kAmount < 0 || key == "" || wordsMap.count(key) < 1) 
+		return group;
+	else {
+		WordNode &currentWordNode =  wordsMap.at(key);
+		std::map< std::string, int > relations = currentWordNode.relations;
+		auto choosedNode = (*relations.begin()).first == theWord ? relations.end() : ++relations.begin() ;
+		key = (choosedNode != relations.end()) ? (*choosedNode).first : "";
+		group.push_back( currentWordNode.word );
+
+		return createGroup(theWord, group, key, kAmount-1 );
+
+	}
 }
 
 std::vector<std::vector<WordNode>> PowerRelationsGraph::getPowerGroups(std::string pWord, int kGroups) {
@@ -132,25 +167,35 @@ std::vector<std::vector<WordNode>> PowerRelationsGraph::getPowerGroups(std::stri
 	Complejidad obtenida: .... TODO */
 
 	std::vector< std::vector<WordNode> > groups;
+
 	if (wordsMap.count(pWord) < 1) {
 		std::cout << "Palabra no encontrada" << std::endl;
 		return groups;
 	}
 
-	// obtener la cantidad de palabras que se pueden acceder desde esta palabra (obtenida en metodo processWordNode)
 	WordNode &pWordNode = wordsMap.at(pWord);
 
 	// calcula la cantidad de palabras por grupo a crear
-	int sizePerGroup = pWordNode.availableWordsAmount / kGroups;
+	//int availableWords = this->getAvailableWordsAmount(pWordNode);
+	int availableWords = pWordNode.availableWordsAmount;
+	int sizePerGroup = availableWords / kGroups;
 
-	std::cout << pWordNode.availableWordsAmount << " palabras accesibles desde \"" << pWord << "\"\n";
+	auto relationsOfGivenWord = pWordNode.relations;
+	auto relationIter = relationsOfGivenWord.begin();
 
-	// std::map<std::string, int> relationsOfGivenWord = wordsMap.at(pWord).relations;
-	// std::string currentWord;
-	// while (groups.size() < m) {
+	int groupCounter = 0;
+	while ( kGroups != groupCounter++  && relationIter != relationsOfGivenWord.end() ) {
 
+		std::string key = (*relationIter).first;
+		std::vector<WordNode> processedGroup;
+		std::vector<WordNode> newGroup = this->createGroup(key, processedGroup, key, sizePerGroup);
 
-	// }
+		if (newGroup.size() >= sizePerGroup) {
+			groups.push_back(newGroup);
+		}
+
+		++relationIter;
+	}
 
 	return groups;
 }
@@ -167,4 +212,8 @@ std::vector<WordNode> PowerRelationsGraph::getPowerWords(int c) {
 
 	std::vector<WordNode> powerWords;
 	return powerWords;
+}
+
+void PowerRelationsGraph::getReady() {
+	// TODO: realizar el precargado de estructuras y demas aca
 }

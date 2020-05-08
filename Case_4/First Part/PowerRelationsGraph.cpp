@@ -26,7 +26,7 @@ private:
 	
 	std::vector<WordNode> _merge(std::vector<WordNode>, std::vector<WordNode>);
 	std::vector<WordNode> _mergeSort(std::vector<WordNode>, int);
-	std::vector<WordNode>& createGroup(std::string, std::vector<WordNode>&, std::string, int);
+	std::vector<WordNode>& createGroup(std::string, std::vector<WordNode>&, int, std::string, int);
 };
 
 void PowerRelationsGraph::sortWordByAvailableNodes() {
@@ -161,11 +161,13 @@ void PowerRelationsGraph::generateSentenceGraph() {
 			
 			// palabra anterior
 			std::advance(wordIterator, -1); 	
-			currentWordNode.processRelation(*wordIterator); // O(log2(n))
+			WordNode& previousNode = processWordNode(*wordIterator, sentenceCounter);
+			currentWordNode.processRelation(previousNode); // O(log2(n))
 
 			// siguiente palabra
-			std::advance(wordIterator, 2); 						
-			currentWordNode.processRelation(*wordIterator); // O(log2(n))
+			std::advance(wordIterator, 2); 	
+			WordNode& nextNode = processWordNode(*wordIterator, sentenceCounter);					
+			currentWordNode.processRelation(nextNode); // O(log2(n))
 
 			wordIterator = currentIt;
 		}	
@@ -192,20 +194,19 @@ void PowerRelationsGraph::generateSentenceGraph() {
  
  }
 
-std::vector<WordNode>& PowerRelationsGraph::createGroup(std::string theWord, std::vector<WordNode> &group, std::string key, int kAmount) {
+std::vector<WordNode>& PowerRelationsGraph::createGroup(std::string theWord, std::vector<WordNode> &group, int relationIndex, std::string key, int kAmount) {
 
-	if (kAmount < 0 || key == "" || wordsMap.count(key) < 1) 
+	auto relations = wordsMap.at(key).relatedNodes;
+	if (kAmount == 0 || relationIndex >= relations.size()) 
 		return group;
 	else {
-		WordNode &currentWordNode =  wordsMap.at(key);
-		std::map< std::string, int > relations = currentWordNode.relations;
-		
-		auto choosedNode = (*relations.begin()).first == theWord ? relations.end() : ++relations.begin() ;
-		key = (choosedNode != relations.end()) ? (*choosedNode).first : "";
-		group.push_back( currentWordNode.word );
-
-		return createGroup(theWord, group, key, kAmount-1 );
-
+		auto possibleWord = relations[relationIndex].word;
+		if (possibleWord == theWord || possibleWord == key) {
+			return createGroup(theWord, group, relationIndex + 1, key, kAmount);
+		} else {
+			group.push_back( possibleWord );
+			return createGroup(theWord, group, 0, possibleWord, kAmount-1 );
+		}
 	}
 }
 
@@ -229,22 +230,20 @@ std::vector<std::vector<WordNode>> PowerRelationsGraph::getPowerGroups(std::stri
 		WordNode &pWordNode = wordsMap.at(pWord);
 
 		// calcula la cantidad de palabras por grupo a crear
-		//int availableWords = this->getAvailableWordsAmount(pWordNode);
 		int availableWords = pWordNode.availableWordsAmount;
-		int sizePerGroup = availableWords / kGroups;
-
-		auto relationsOfGivenWord = pWordNode.relations;
-		auto relationIter = relationsOfGivenWord.begin();
+		int sizePerGroup = pWordNode.relatedNodes.size() / kGroups;
+		auto relationIter = pWordNode.relatedNodes.begin();
 
 		int groupCounter = 0;
-		while ( kGroups != groupCounter++  && relationIter != relationsOfGivenWord.end() ) {
+		while ( groups.size() < kGroups  && relationIter != pWordNode.relatedNodes.end() ) {
 
-			std::string key = (*relationIter).first;
+			std::string key = (*relationIter).word;
 			std::vector<WordNode> processedGroup;
-			this->createGroup(key, processedGroup, key, sizePerGroup);
+			this->createGroup(pWord, processedGroup, 0, key, sizePerGroup);
 
-			if (processedGroup.size() == sizePerGroup)
+			if (processedGroup.size() == sizePerGroup) {
 				groups.push_back(processedGroup);
+			}
 			
 			++relationIter;
 		}

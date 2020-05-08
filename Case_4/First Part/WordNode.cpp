@@ -9,6 +9,7 @@ public:
 	std::string word;
 	int appearances, mapIndex, lastInsertedSentenceIndex, availableWordsAmount;
 	std::map <std::string, int> relations;
+	std::vector<WordNode> relatedNodes;
 	std::vector <int> sentencesCodes;
 
 	WordNode(std::string word) { 
@@ -18,7 +19,7 @@ public:
 	}
 
 	bool existRelation(std::string key);
-	void processRelation(std::string);
+	void processRelation(WordNode&);
 	
 	friend std::ostream& operator << (std::ostream &o,const WordNode &object) {
 		o << "***********************" << std::endl << 
@@ -33,6 +34,8 @@ public:
 					o << "\n\t";
 				counter++;
 			}
+
+		o << "\nRelated Nodes: " << object.relatedNodes.size() << "\n\t";
 	
 		o << "\nAppearances:" << object.appearances << std::endl <<
 		"Available Words:" << object.availableWordsAmount <<
@@ -53,7 +56,7 @@ bool WordNode::existRelation(std::string key) {
 	return relations.count(key) == 1; // O(log(n)) 
 }
 
-void WordNode::processRelation(std::string nearWord) {
+void WordNode::processRelation(WordNode& nearWordNode) {
 	/* 
 			Objetivo: obtener caracter a caracter el contenido del archivo de texto, 
 			tomando en cuenta cada palabra para formar una oracion delimitada por punto '.'
@@ -62,10 +65,12 @@ void WordNode::processRelation(std::string nearWord) {
 	Complejidad obtenida: O(log(n)) siendo n la cantidad de relaciones
 	*/
 
-	if ( !existRelation(nearWord) )
-		relations.insert( {nearWord, 1} ); // O(n*log(k+n)) siendo n la cantidad de elementos a insertar (1), y k el tamanio del contenedor
+	if ( !existRelation(nearWordNode.word) ) {
+		relatedNodes.push_back(nearWordNode);
+		relations.insert( {nearWordNode.word, 1} ); // O(n*log(k+n)) siendo n la cantidad de elementos a insertar (1), y k el tamanio del contenedor
+	}
 	else 
-		relations.at( nearWord )++; // O(log(n)) siendo n la cantidad de elementos en el mapa de relaciones
+		relations.at( nearWordNode.word )++; // O(log(n)) siendo n la cantidad de elementos en el mapa de relaciones
 }
 
 

@@ -2,25 +2,23 @@
 #include <utility>
 #include <iostream>
 
-using namespace std;
-
 class WordNode { 
 public:
+
 	std::string word;
 	int appearances, mapIndex, lastInsertedSentenceIndex, availableWordsAmount;
-	std::map <std::string, int> relations;
+	std::unordered_map <std::string, int> relations;
 	std::vector<WordNode> relatedNodes;
 	std::vector <int> sentencesCodes;
 
-	WordNode(std::string word) { 
-		this->word = word; 
+	WordNode(std::string word): word(word){ 
 		appearances = mapIndex = availableWordsAmount = 0;
 		lastInsertedSentenceIndex = -1;
 	}
 
 	bool existRelation(std::string key);
 	void processRelation(WordNode&);
-	
+
 	friend std::ostream& operator << (std::ostream &o,const WordNode &object) {
 		o << "***********************" << std::endl << 
 			"Word: [" << object.word << "] " <<std::endl <<
@@ -34,9 +32,7 @@ public:
 					o << "\n\t";
 				counter++;
 			}
-
-		o << "\nRelated Nodes: " << object.relatedNodes.size() << "\n\t";
-	
+				
 		o << "\nAppearances:" << object.appearances << std::endl <<
 		"Available Words:" << object.availableWordsAmount <<
 		"\n***********************" << std::endl;
@@ -72,5 +68,3 @@ void WordNode::processRelation(WordNode& nearWordNode) {
 	else 
 		relations.at( nearWordNode.word )++; // O(log(n)) siendo n la cantidad de elementos en el mapa de relaciones
 }
-
-

@@ -1,4 +1,4 @@
-#define DELIMITER '.'
+#define DELIMITER '.' // delimiter '.' of the sentence
 
 namespace TextFormatter {
 
@@ -20,6 +20,12 @@ namespace TextFormatter {
 			return false;
 
 		if (word[word.size()-3] == 'n' &&  word[word.size()-2] == 'd' && word[word.size()-1] == 'o')
+			return false;
+
+		if (word[word.size()-3] == 's' &&  word[word.size()-2] == 't' && (word[word.size()-1] == 'o' || word[word.size()-1] == 'a' || word[word.size()-1] == 'e')  )
+			return false;
+
+		if (word[word.size()-3] == 'r' &&  (word[word.size()-2] == 'o' || word[word.size()-2] == 'a') && word[word.size()-1] == 'n')
 			return false;
 
 		if (word[word.size()-3] == 'a' &&  word[word.size()-2] == 'b' && word[word.size()-1] == 'a'
@@ -71,7 +77,7 @@ namespace TextFormatter {
 					currentSentence.push_back(text);
 			}
 
-			if (characterReaded == DELIMITER) { // delimiter '.' of the sentence
+			if (characterReaded == DELIMITER) { 
 				if (currentSentence.size() > 1)
 					sentenceList.push_back(currentSentence);
 				currentSentence.clear();	

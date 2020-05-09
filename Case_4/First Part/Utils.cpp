@@ -19,28 +19,28 @@ namespace Utils {
 			std::cout << "===> Group #" << (++groupCounter) << std::endl;
 			
 			for (auto const &word: wordGroup) 
-				std::cout << "[" <<word.word << "]: power counter = " << word.availableWordsAmount << std::endl;
+				std::cout << "[" <<word.word << "]"<< std::endl;
 		
 			std::cout << "===================================" << std::endl;
 		}
 
-		std::cout << "\n######################################################################" << std::endl;
+		std::cout << "\n######################################################################\n" << std::endl;
 	}
 
 	void show(std::vector<WordNode> powerWords) {
 
 		// Complejidad algoritmica: O(n) siendo n la cantidad de nodos de palabra de la lista
 
-		std::cout << "\n######################################################################" << std::endl;
+		std::cout << "\n######################################################################\n" << std::endl;
 		// encabezado
 		std::cout << "(" << powerWords.size() << 
-			") PowerWords (criteria: maximum available nodes from the word) \n" << std::endl;
+			") PowerWords: \n" << std::endl;
 
 		// mostrando nodos de las palabras
 		for (auto const &word: powerWords) 
 			std::cout << word << std::endl;
 		
-		std::cout << "\n######################################################################" << std::endl;
+		std::cout << "\n######################################################################\n" << std::endl;
 	}
 
 }

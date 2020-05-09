@@ -37,18 +37,16 @@ int main() {
 	PowerRelationsGraph graph(COMPLETE_TEXT_FILENAME); 
 	graph.getReady(); // O(nlog(n))
 
-	std::cout << graph.wordsMap.at("hombre");
-
 	//Querying for groups
-	std::string queryedWord = "hombre";
-	int requestedGroups = 3;
+	std::string queryedWord = "costumbre";
+	int requestedGroups = 4;
 	auto groups = graph.getPowerGroups( queryedWord, requestedGroups );
 	show( groups, queryedWord, requestedGroups );
 
-	// // Querying for power words
-	// int requestedPowerWords = 2;
-	// auto powerWords = graph.getPowerWords( requestedPowerWords );
-	// show( powerWords );
+	// Querying for power words
+	int requestedPowerWords = 5;
+	auto powerWords = graph.getPowerWords( requestedPowerWords );
+	show( powerWords );
 
 	return EXIT_SUCCESS;
 }

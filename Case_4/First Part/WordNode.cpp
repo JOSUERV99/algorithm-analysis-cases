@@ -1,30 +1,28 @@
-#include <string>
-#include <utility>
-#include <iostream>
 
 class WordNode { 
 public:
 
 	std::string word;
-	int appearances, mapIndex, lastInsertedSentenceIndex, availableWordsAmount;
+	int appearances, lastInsertedSentenceIndex, availableWordsAmount;
 	std::unordered_map <std::string, int> relations;
 	std::vector<WordNode> relatedNodes;
 	std::vector <int> sentencesCodes;
 
 	WordNode(std::string word): word(word){ 
-		appearances = mapIndex = availableWordsAmount = 0;
+		appearances = availableWordsAmount = 0;
 		lastInsertedSentenceIndex = -1;
 	}
 
 	bool existRelation(std::string key);
 	void processRelation(WordNode&);
 
+	// sobreescritura de operador para stream de salida por pantalla
 	friend std::ostream& operator << (std::ostream &o,const WordNode &object) {
 		o << "***********************" << std::endl << 
 			"Word: [" << object.word << "] " <<std::endl <<
 			"Relations: " << object.relations.size() << "\n\t";
 
-		int counter = 0;
+		int counter = 0; // para formateo en vista en pantalla
 		for (auto const &relation: object.relations) 
 			if (relation.second > 0) { 
 				o << "{" << relation.first << "," << relation.second << "}, ";
@@ -44,12 +42,12 @@ bool WordNode::existRelation(std::string key) {
 	/* 
 			Objetivo: verificar si la palabra tiene relacion con este nodo
 	------------------------------------------------------------------------------------
-	Complejidad obtenida: O(log(n)) siendo n la cantidad de relaciones
+	Complejidad obtenida: O(c)
 	*/
 
 	if (relations.size() == 0)
 		return false;
-	return relations.count(key) == 1; // O(log(n)) 
+	return relations.count(key) == 1;
 }
 
 void WordNode::processRelation(WordNode& nearWordNode) {
@@ -57,14 +55,13 @@ void WordNode::processRelation(WordNode& nearWordNode) {
 			Objetivo: obtener caracter a caracter el contenido del archivo de texto, 
 			tomando en cuenta cada palabra para formar una oracion delimitada por punto '.'
 	------------------------------------------------------------------------------------
-	// Nota: log(n) y no log(k) porque k en el peor de los casos seria n (almacenando todas las palabras en el mismo contenedor)
-	Complejidad obtenida: O(log(n)) siendo n la cantidad de relaciones
+	Complejidad obtenida: O(c)
 	*/
 
-	if ( !existRelation(nearWordNode.word) ) {
+	if ( !existRelation(nearWordNode.word) ) { // O(c)
 		relatedNodes.push_back(nearWordNode);
-		relations.insert( {nearWordNode.word, 1} ); // O(n*log(k+n)) siendo n la cantidad de elementos a insertar (1), y k el tamanio del contenedor
+		relations.insert( {nearWordNode.word, 1} );
 	}
 	else 
-		relations.at( nearWordNode.word )++; // O(log(n)) siendo n la cantidad de elementos en el mapa de relaciones
+		relations.at( nearWordNode.word )++;
 }

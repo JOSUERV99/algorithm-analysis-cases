@@ -1,0 +1,58 @@
+Ejercicio:
+
+	Dado el siguiente video 'luces.mp4' que está en el Dropbox, asumiendo
+	que son dos colores únicamente, y que se quieren pintar K círculos. 
+
+	Cómo podría usted generar una salida que le permita a un UI
+	pintar de la forma más rápida posible dichos puntos o círculos de 
+	colores de tal forma que se genera la misma animación del video en un
+	ciclo infinito.
+
+/////////////////////////////////////////////////////////////////////////
+
+
+1. Estrategia para dibujado de circulos
+
+	Tomando en cuenta que el circulo esta formado por n cantidad de puntos,
+	usamos la funcion cos(x) para formar el circulo:
+
+	Siendo n una cantidad de al menos 6 puntos para aproximar de mejor manera 
+	la forma de un circulo. 
+
+		Periodo de cos(x) = 2π 
+		Cantidad de puntos para el circulo = N
+		Radio del circulo = R
+
+		entonces:
+
+			points as list with size of N
+			for i in the range of N:
+				points[i] = [ cos(i) * R, sin(i) * R ]
+
+		aplicando este procedimiento k veces para crear cada uno de los circulos
+
+
+
+Consideraciones previas a considerar
+
+	1. Tomando el cuenta que la gran mayoria de los entornos graficos
+	mantienen el eje de coordenadas en 2D en la esquina superior izquierda 
+	del componente grafico (Canvas, Panel, Frame,...), se debe considerar moverse el
+	eje de las coordenadas a (W/2, H/2) siendo W el ancho y H el alto
+
+
+	2. En base a los k circulos y como se visualiza los circulos en el video, 
+	se deben generar otros m circulos basados en cada uno 
+	de los circulos iniciales, aumentando el radio de cada uno para obtener
+	el circulo principal como el circulo central, y m circulos que son derivados de este
+
+
+	3. Para evitar el solapamiento de los circulos principales se debe fijar una distancia 
+	de al menos Z, siendo Z >= 2*(R + P) , 2*R para salir del diametro de un circulo 
+	y P la cantidad de pixeles por formados por la union de cada uno los puntos de circulo
+
+
+	4. TODO: hablar acerca del movimiento entre los dos circulos .... abs(cos(x))...
+
+
+

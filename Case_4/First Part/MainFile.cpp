@@ -5,18 +5,17 @@
 #include <string>
 #include <algorithm>
 #include <stdio.h>
-#include <map>
 #include <algorithm>
 #include <ctype.h>
 #include <vector>
-#include <utility>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "PowerRelationsGraph.cpp"
 #include "Utils.cpp"
 
-#define COMPLETE_TEXT_FILENAME "TextToAnalize.txt" 		
-#define FIRST_PARAGRAPH_FILENAME "FirstParagraph.txt" 
+#define COMPLETE_TEXT_FILENAME 	"El_libro_de_Urantia.txt" 		
+#define STOP_WORDS_FILENAME 		"Stop_words_set.txt"
 
 using namespace Utils;
 
@@ -31,10 +30,10 @@ int main() {
 					- Palabra anterior y consecutiva
 					- Palabras dentro de la misma oracion
 			[4] Una vez dada la precarga del grafo de palabras y ordenacion de palabras 
-			para consulta de por poder de palabra respecto al texto y uso de relaciones 
+			para consulta por poder de palabra respecto al texto y uso de relaciones 
 	*/
 
-	PowerRelationsGraph graph(COMPLETE_TEXT_FILENAME); 
+	PowerRelationsGraph graph(COMPLETE_TEXT_FILENAME, STOP_WORDS_FILENAME); 
 	graph.getReady();
 
 	// Querying for groups

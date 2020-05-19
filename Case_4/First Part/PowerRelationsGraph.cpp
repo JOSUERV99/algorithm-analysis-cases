@@ -1,25 +1,25 @@
 #include "WordNode.cpp"
 #include "TextFormatter.cpp"
 
-#define SENTENCE_MODE 1
-#define WORD_MODE 0
-
 class PowerRelationsGraph {
 public:
 
-	struct comparator {
+	struct WordNodeComparator {
 		// uso en ordenamiento para obtener las palabras de poder del texto
 		bool operator() (const WordNode& word1,const WordNode& word2) { 
 			return word1.relatedNodes.size() > word2.relatedNodes.size();
 		}
+
 	} WordNodeComparator;
 
-	std::string filename;
+	std::string filename, stopWordsFilename;
 	std::vector<WordNode> powerWords;
 	std::unordered_map <std::string, WordNode> wordsMap;
+	std::unordered_set <std::string> stopwords;
 	std::vector<std::vector<std::string>> sentencesBag;
 	
-	PowerRelationsGraph(std::string filename): filename(filename) {} 
+	PowerRelationsGraph(std::string filename, std::string stopWordsFilename): 
+		filename(filename), stopWordsFilename(stopWordsFilename) {} 
 
 	void getReady();
 	std::vector<WordNode> getPowerWords(int);
@@ -39,11 +39,14 @@ WordNode& PowerRelationsGraph::processWord(std::string word, int sentenceIndex) 
 	------------------------------------------------------------------------------------
 	Complejidad obtenida: O(c)  */
 
-	if (wordsMap.count(word) == 0) {
+	if (wordsMap.find(word) == wordsMap.end()) {
 
 		// agregado de palabra al hashmap
 		WordNode newWordNode = WordNode(word);
 		wordsMap.insert({word,newWordNode}); 
+
+		WordNode& currentWord = wordsMap.at(word);
+		currentWord.lastInsertedSentenceIndex = sentenceIndex;
 
 		// primera aparicion de la palabra
 		wordsMap.at(word).appearances++;
@@ -54,13 +57,8 @@ WordNode& PowerRelationsGraph::processWord(std::string word, int sentenceIndex) 
 		
 		// en caso de que la palabra exista dos veces en la misma oracion se cuenta como una sola
 		if (currentWord.lastInsertedSentenceIndex != sentenceIndex) {
-			
-			currentWord.sentencesCodes.push_back(sentenceIndex);
-			currentWord.lastInsertedSentenceIndex = sentenceIndex;
 		
-			// calculando el numero de palabras accesibles del nodo actual
-			currentWord.availableWordsAmount += sentencesBag.at(sentenceIndex).size();
-
+			currentWord.lastInsertedSentenceIndex = sentenceIndex;
 			wordsMap.at(word).appearances++;
 		}	
 	}
@@ -84,26 +82,22 @@ void PowerRelationsGraph::generateSentenceGraph() {
 	Complejidad obtenida: O(n) siendo n la cantidad de palabras distribuidas en la lista de oraciones */	
 
 	int sentenceCounter = 0;
-	for (auto &sentence : sentencesBag) {
+	for (auto sentence : sentencesBag) {
 
-		auto penultPosition =  --(sentence.end());
-		for (auto wordIterator = ++sentence.begin(); wordIterator != penultPosition; ++wordIterator) {
-			
-			auto currentIt = wordIterator; 
-			WordNode& currentWordNode = processWord(*wordIterator, sentenceCounter);  // O(log2(n))
-			
+		for(int wordCounter = 1; wordCounter < sentence.size() - 1; wordCounter++) {
+
+			auto &currentWordNode = processWord( sentence[ wordCounter ], sentenceCounter);
+
 			// palabra anterior
-			std::advance(wordIterator, -1); 	
-			WordNode& previousNode = processWord(*wordIterator, sentenceCounter);
-			currentWordNode.processRelation(previousNode); // O(log2(n))
+			auto &previousWordNode = processWord( sentence[ wordCounter - 1 ], sentenceCounter);
+			currentWordNode.processRelation(previousWordNode);
 
-			// siguiente palabra
-			std::advance(wordIterator, 2); 	
-			WordNode& nextNode = processWord(*wordIterator, sentenceCounter);					
-			currentWordNode.processRelation(nextNode); // O(log2(n))
+			// palabra posterior
+			auto &nextWordNode = processWord( sentence[ wordCounter + 1 ], sentenceCounter);
+			currentWordNode.processRelation(nextWordNode);
 
-			wordIterator = currentIt;
-		}	
+		}
+
 		sentenceCounter++;
 	}
 
@@ -125,7 +119,7 @@ std::vector<WordNode>& PowerRelationsGraph::createGroup(std::string theWord, std
 		y de forma recursiva segun la palabra elegida, volver a elegir una de esas palabras 
 		para formar el grupo con k tamaño
 	------------------------------------------------------------------------------------
-	Complejidad obtenida: .... TODO */
+	Complejidad obtenida: O(c) */
 
 	auto relations = wordsMap.at(key).relatedNodes;
 	if (kAmount == 0 || relationIndex >= relations.size()) 
@@ -136,7 +130,7 @@ std::vector<WordNode>& PowerRelationsGraph::createGroup(std::string theWord, std
 			return createGroup(theWord, group, relationIndex + 1, key, kAmount);
 		else {
 			group.push_back( possibleWord );
-			return createGroup(theWord, group, 0, possibleWord, kAmount-1 );
+			return createGroup(theWord, group, 0, possibleWord, kAmount - 1 );
 		}
 	}
 }
@@ -149,7 +143,7 @@ std::vector<std::vector<WordNode>> PowerRelationsGraph::getPowerGroups(std::stri
 		calcular la cantidad de vertices (WordNode's) por k grupos a crear, recorrido de las relaciones
 		de la palabra dada para generar los grupos, de forma recursiva ( ver createGroup() )
 	------------------------------------------------------------------------------------
-	Complejidad obtenida: .... O(c)? */
+	Complejidad obtenida: O(c) */
 
 	std::vector<std::vector<WordNode>> groups;
 
@@ -191,13 +185,12 @@ std::vector<WordNode> PowerRelationsGraph::getPowerWords(int cWords) {
 
 	std::vector<WordNode> wordsToReturn;
 
-	std::cout << "Here: " << powerWords.size() << std::endl;
-
 	if (cWords > powerWords.size())
 		return powerWords;
 
-	while (cWords > 0) 
-		wordsToReturn.push_back(powerWords[ cWords-- ]);
+	int counter = 0;
+	while (counter < cWords) 
+		wordsToReturn.push_back(powerWords[ counter++ ]);
 
 	return wordsToReturn;
 }
@@ -209,12 +202,18 @@ void PowerRelationsGraph::getReady() {
 	------------------------------------------------------------------------------------
 		Complejidad maxima: O( nlog2(n) ) */
 
+
 	// Complejidad obtenida: O(n) siendo n la cantidad de caracteres
-	sentencesBag = TextFormatter::readSentencesListFromFile(filename); 
+	stopwords = TextFormatter::readWordsSet(stopWordsFilename);
 
-	// Complejidad obtenida: O(n) siendo n la cantidad de palabras en las oraciones
-	generateSentenceGraph();    
+	// Complejidad obtenida: O(n) siendo n la cantidad de caracteres
+	sentencesBag = TextFormatter::readSentencesListFromFile(filename, stopwords); 
 
-	// Complejidad obtenida: O(nlog2(n)) (estable) using *IntroSort*, merging QuickSort, SelectionSort and HeapSort
+	// Complejidad obtenida: O(n) siendo n la cantidad de palabras
+	generateSentenceGraph();   
+
+	// Palabras de poder
+	// Complejidad obtenida: O(nlog2(n)) (estable)  *IntroSort*, merging QuickSort, SelectionSort and HeapSort
 	std::sort(powerWords.begin(), powerWords.end(), WordNodeComparator);
+
 }

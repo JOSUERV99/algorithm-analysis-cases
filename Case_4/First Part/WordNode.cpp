@@ -1,20 +1,18 @@
-
 class WordNode { 
 public:
 
 	std::string word;
-	int appearances, lastInsertedSentenceIndex, availableWordsAmount;
+	int appearances, lastInsertedSentenceIndex;
 	std::unordered_map <std::string, int> relations;
 	std::vector<WordNode> relatedNodes;
-	std::vector <int> sentencesCodes;
 
 	WordNode(std::string word): word(word){ 
-		appearances = availableWordsAmount = 0;
+		appearances = 0;
 		lastInsertedSentenceIndex = -1;
 	}
 
-	bool existRelation(std::string key);
-	void processRelation(WordNode&);
+	bool existRelation( std::string key );
+	void processRelation( WordNode& );
 
 	// sobreescritura de operador para stream de salida por pantalla
 	friend std::ostream& operator << (std::ostream &o,const WordNode &object) {
@@ -31,8 +29,7 @@ public:
 				counter++;
 			}
 				
-		o << "\nAppearances:" << object.appearances << std::endl <<
-		"Available Words:" << object.availableWordsAmount <<
+		o << "\nAppearances:" << object.appearances <<
 		"\n***********************" << std::endl;
 		return o;
 	}

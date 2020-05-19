@@ -24,14 +24,14 @@ namespace Utils {
 			std::cout << "===================================" << std::endl;
 		}
 
-		std::cout << "\n######################################################################\n" << std::endl;
+		std::cout << "######################################################################" << std::endl;
 	}
 
 	void show(std::vector<WordNode> powerWords) {
 
 		// Complejidad algoritmica: O(n) siendo n la cantidad de nodos de palabra de la lista
 
-		std::cout << "\n######################################################################\n" << std::endl;
+		std::cout << "######################################################################\n" << std::endl;
 		// encabezado
 		std::cout << "(" << powerWords.size() << 
 			") PowerWords: \n" << std::endl;
@@ -40,7 +40,7 @@ namespace Utils {
 		for (auto const &word: powerWords) 
 			std::cout << word << std::endl;
 		
-		std::cout << "\n######################################################################\n" << std::endl;
+		std::cout << "######################################################################" << std::endl;
 	}
 
 }

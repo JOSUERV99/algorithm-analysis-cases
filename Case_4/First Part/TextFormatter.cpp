@@ -1,25 +1,44 @@
-#define DELIMITER '.' // delimiter '.' of the sentence
+#define DELIMITER '.' // delimitador '.' de la oracion
 
 namespace TextFormatter {
 
-	/* 
-		Extraccion de caracteres del archivo para crear palabras, y con estas crear oraciones siguiendo
-		el criterio de la function 'wordAccepted'
-	*/
+	bool charAccepted(char characterReaded) {
+
+		// Filtro de caracteres para delimitar a una palabra
+		// Complejidad obtenida: O(c)
+
+		return characterReaded && 
+			characterReaded != DELIMITER && 
+			characterReaded != EOF && 
+			!isspace(characterReaded) && 
+			!isdigit(characterReaded) && 
+			!ispunct(characterReaded);
+	}
 
 	bool wordAccepted(std::string word) {
 
-		// Criterio segun generalizacion de caracteristicas que normalmente se asocian a los sustantivos
+		// Criterio segun generalizacion de caracteristicas que normalmente se asocian a las palabras que no
+		// son sustantivos
+
+		/*
+			Terminando en:
+				ndo
+				nda
+				ste
+				sta
+				sto
+				ran
+				ron
+				aba
+				aban
+		*/
+
 		// Complejidad obtenida: O(c)
 
 		if (word.size() <= 4)
 			return false; 
 
-		// empieza con h y sigue a, e, o
-		if ( word[0] == 'h' && (word[1] == 'a' || word[1] == 'u' || word[1] == 'e'))
-			return false;
-
-		if (word[word.size()-3] == 'n' &&  word[word.size()-2] == 'd' && word[word.size()-1] == 'o')
+		if (word[word.size()-3] == 'n' &&  word[word.size()-2] == 'd' && (word[word.size()-1] == 'o' || word[word.size()-1] == 'a'))
 			return false;
 
 		if (word[word.size()-3] == 's' &&  word[word.size()-2] == 't' && (word[word.size()-1] == 'o' || word[word.size()-1] == 'a' || word[word.size()-1] == 'e')  )
@@ -37,20 +56,41 @@ namespace TextFormatter {
 			word[word.size()-3] != 'n' &&  word[word.size()-2] != 'd' && word[word.size()-1] != 'o';
 	}
 
-	bool charAccepted(char characterReaded) {
+	std::unordered_set<std::string> readWordsSet(std::string filename) {
 
-		// Filtro de caracteres para delimitar a una palabra
-		// Complejidad obtenida: O(c)
+		/* 
+			Objetivo: obtener caracter a caracter el contenido del archivo de texto, 
+			creando palabras y agregandolas al set
 
-		return characterReaded && 
-			characterReaded != DELIMITER && 
-			characterReaded != EOF && 
-			!isspace(characterReaded) && 
-			!isdigit(characterReaded) && 
-			!ispunct(characterReaded);
+		Complejidad obtenida: O(n) siendo n la cantidad de caracteres */
+
+		std::ifstream reader (filename, std::ifstream::in);
+		std::unordered_set <std::string> wordsSet; 
+		
+		std::string text = "";
+
+		while (reader.good()) {
+
+			char characterReaded = tolower(reader.get());
+
+			while ( charAccepted(characterReaded) ) {
+				text += characterReaded;
+				characterReaded = reader.get();
+			}
+			
+			if (text != "") {
+				wordsSet.insert(text);
+			}
+
+			text = "";
+		}
+
+		reader.close();
+		return wordsSet;
+
 	}
 
-	std::vector<std::vector<std::string>> readSentencesListFromFile(std::string filename) {
+	std::vector<std::vector<std::string>> readSentencesListFromFile(std::string filename, std::unordered_set<std::string>& stopWords) {
 
 		/* 
 			Objetivo: obtener caracter a caracter el contenido del archivo de texto, 
@@ -74,11 +114,12 @@ namespace TextFormatter {
 			
 			if (text != "") {
 				if (wordAccepted(text))
+				if ( stopWords.count(text) < 1 ) // si no existe en el set
 					currentSentence.push_back(text);
 			}
 
 			if (characterReaded == DELIMITER) { 
-				if (currentSentence.size() > 1)
+				if (currentSentence.size() > 3)
 					sentenceList.push_back(currentSentence);
 				currentSentence.clear();	
 			}

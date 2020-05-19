@@ -1,4 +1,4 @@
-Ejercicio:
+Enunciado:
 
 	Dado el siguiente video 'luces.mp4' que está en el Dropbox, asumiendo
 	que son dos colores únicamente, y que se quieren pintar K círculos. 
@@ -9,7 +9,6 @@ Ejercicio:
 	ciclo infinito.
 
 /////////////////////////////////////////////////////////////////////////
-
 
 1. Estrategia para dibujado de circulos
 
@@ -29,16 +28,14 @@ Ejercicio:
 			for i in the range of N:
 				points[i] = [ cos(i) * R, sin(i) * R ]
 
-		aplicando este procedimiento k veces para crear cada uno de los circulos
-
-
+		aplicando este procedimiento 1 sola vez
+		y copiando el circulo k veces para crear cada uno de los circulos
 
 Consideraciones previas a considerar
 
 	1. Tomando el cuenta que la gran mayoria de los entornos graficos
-	mantienen el eje de coordenadas en 2D en la esquina superior izquierda 
-	del componente grafico (Canvas, Panel, Frame,...), se debe considerar moverse el
-	eje de las coordenadas a (W/2, H/2) siendo W el ancho y H el alto
+	mantienen el eje de coordenadas en 2D en la esquina superior izquierda, 
+	se debe considerar moverse el eje de las coordenadas a (W/2, H/2) siendo W el ancho y H el alto
 
 
 	2. En base a los k circulos y como se visualiza los circulos en el video, 
@@ -51,8 +48,19 @@ Consideraciones previas a considerar
 	de al menos Z, siendo Z >= 2*(R + P) , 2*R para salir del diametro de un circulo 
 	y P la cantidad de pixeles por formados por la union de cada uno los puntos de circulo
 
+/////////////////////////////////////////////////////////////////////////
 
-	4. TODO: hablar acerca del movimiento entre los dos circulos .... abs(cos(x))...
+Movimiento de circulos
 
+En este punto se tiene dos circulos iguales en las misma posicion, con el mismo radio
+entonces:
 
+1. Colocamos el primer circulo, de forma que el centro, quede localizado
+	en (x,y) = (  width/2 , height/2 - radio + 1  ) y el segundo circulo
+	con las coordenadas (x,y) = (  width/2 , height/2 + radio + 1 )
 
+	De esta forma los centros quedan paralelos pero con una distancia entre sus centros de 
+	2*(R+1) siendo R el radio.
+
+2. Despues de un analisis del movimiento de cada uno los circulos,  podemos notar que cada uno de ellos
+se mueve de forma 

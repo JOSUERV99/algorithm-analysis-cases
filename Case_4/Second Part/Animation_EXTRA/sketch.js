@@ -7,7 +7,7 @@ function setup() {
   w = 650;
   h = 500;
   radius = 20;
-  pointSize = 4;
+  pointSize = 6;
   angle = myColor = 0;
   step = 25;
   circles = 6;
@@ -16,6 +16,8 @@ function setup() {
   xmov1 = ymov1 = xmov2 = ymov2 = 0;
   movementRange = 20;
   
+  myColor = ['blue', 'yellow'];
+
   createCanvas(w, h);
   // create points
   myPoints = getPoints(divisions, scale_);
@@ -26,15 +28,15 @@ function setup() {
 function draw() {
   background(0);
   
-  translate(w/2, h/2);
+   translate(w/2, h/2);
   for (let offset = 0; offset < circles*step; offset+=step)
     for (let i=0; i<myPoints.length; i++)
-      myPoints[i].show(offset, angle, xmov1, ymov1);
+      myPoints[i].show(myColor[0], offset, angle, xmov1, ymov1);
   
   translate(-radius/4, -radius/4);
   for (let offset = 0; offset < circles*step; offset+=step)
     for (let i=0; i<myOtherPoints.length; i++)
-      myOtherPoints[i].show(offset, angle, xmov2, ymov2);
+      myOtherPoints[i].show(myColor[1], offset, angle, xmov2, ymov2);
   
   xmov1 =  abs( cos(angle) )*(movementRange)+radius;
   ymov1 =  sin(   angle    )*(movementRange)+radius;
@@ -54,10 +56,11 @@ function getPoints(n, scale) {
 function MyPoint(x, y) {
   this.x = x;
   this.y = y;
-  this.show = function(offset, angle, xmov, ymov) {
+  this.show = function(color, offset, angle, xmov, ymov) {
     stroke(0);
-    rect( (this.x)*( cos(angle)/cos(angle) )*(radius +     offset)+xmov, 
-         (this.y)*( sin(angle)/sin(angle) )*(radius + offset)+ymov, 
+    fill(color)
+    rect( (this.x)*(radius + offset)+xmov, 
+         (this.y)*(radius + offset)+ymov, 
          pointSize, pointSize);
     
     // rect( (this.x)*( cos(angle)/cos(angle) )*(radius + offset), 

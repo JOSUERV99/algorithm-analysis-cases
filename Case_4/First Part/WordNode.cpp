@@ -2,13 +2,13 @@ class WordNode {
 public:
 
 	std::string word;
-	int appearances, lastInsertedSentenceIndex;
+	int appearances, lastInsertedSentenceIndex, powerCounter, powerIndex;
 	std::unordered_map <std::string, int> relations;
 	std::vector<WordNode> relatedNodes;
 
 	WordNode(std::string word): word(word){ 
-		appearances = 0;
-		lastInsertedSentenceIndex = -1;
+		appearances = powerCounter = 0;
+		lastInsertedSentenceIndex = powerIndex = -1;
 	}
 
 	bool existRelation( std::string key );

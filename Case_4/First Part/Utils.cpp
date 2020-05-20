@@ -43,4 +43,19 @@ namespace Utils {
 		std::cout << "######################################################################" << std::endl;
 	}
 
+	void show(std::vector<WordNode> dominatedWords, std::string word) {
+
+		// Complejidad algoritmica: O(n) siendo n la cantidad de nodos de palabra de la lista
+
+		std::cout << "######################################################################" << std::endl;
+		// encabezado
+		std::cout << "(" << word << ") tiene bajo su poder: " << std::endl;
+
+		// mostrando nodos de las palabras
+		for (auto const &word: dominatedWords) 
+			std::cout << word.word << ": " << word.powerCounter << std::endl;
+		
+		std::cout << "######################################################################" << std::endl;
+	}
+
 }

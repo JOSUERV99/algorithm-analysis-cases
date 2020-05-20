@@ -94,14 +94,14 @@ void CircleGenerator::loadFrames() {
 	CIRCLE_STRUCT lastCircle_FirstGroup, lastCircle_SecondGroup;
 
 	float angle = 0.0f; // determina la nueva posicion de los circulos
-	int frameCounter = 1;
+	int frameCounter = 2;
 	while (frameCounter < framesAmount ) {
 
 		// primer grupo de circulos
 		float xmov1 =  abs( cos(angle) ) * radius;
 	  	float ymov1 =  sin(   angle    ) * radius;
 
-	  	lastCircle_FirstGroup = frames[frameCounter-1][0]; 
+	  	lastCircle_FirstGroup = frames[frameCounter - 2][0]; 
 	  	CIRCLE_STRUCT movedCircle_FirstGroup = moveCircle(lastCircle_FirstGroup, xmov1, ymov1);
 	  	lastCircle_FirstGroup = movedCircle_FirstGroup;
 
@@ -109,7 +109,7 @@ void CircleGenerator::loadFrames() {
 	  	float xmov2 = - abs( cos(angle) ) * radius;
 	  	float ymov2 = - sin(   angle    ) * radius;
 
-	  	lastCircle_SecondGroup = frames[frameCounter-1][1]; 
+	  	lastCircle_SecondGroup = frames[frameCounter - 1][1]; 
 	  	CIRCLE_STRUCT movedCircle_SecondGroup = moveCircle(lastCircle_SecondGroup, xmov2, ymov2);
 	  	lastCircle_SecondGroup = movedCircle_SecondGroup;	
 
@@ -187,7 +187,7 @@ int main() {
 	int pointsPerCircle = 8;
 	int radius = 80;
 	int kCirclesPerGroup = 4;
-	float distanceRate = 0.1;
+	float distanceRate = 0.1f;
 	POINT initialPos = {0,0};
 	COLOR colors = { {255, 0, 0}, {10, 230, 10}  }; // (rgb mode)
 

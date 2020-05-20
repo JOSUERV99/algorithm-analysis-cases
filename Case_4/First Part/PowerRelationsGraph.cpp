@@ -7,7 +7,7 @@ public:
 	struct WordNodeComparator {
 		// uso en ordenamiento para obtener las palabras de poder del texto
 		bool operator() (const WordNode& word1,const WordNode& word2) { 
-			return word1.relatedNodes.size() > word2.relatedNodes.size();
+			return word1.powerCounter > word2.powerCounter;
 		}
 
 	} WordNodeComparator;
@@ -23,9 +23,11 @@ public:
 
 	void getReady();
 	std::vector<WordNode> getPowerWords(int);
+	std::vector<WordNode> getDominatedWords(std::string);
 	std::vector<std::vector<WordNode>> getPowerGroups(std::string, int);
 
 private:
+	void setPowerPositions();
 	void generateSentenceGraph();
 	WordNode& processWord(std::string word, int); 
 	std::vector<WordNode>& createGroup(std::string, std::vector<WordNode>&, int, std::string, int);
@@ -48,6 +50,9 @@ WordNode& PowerRelationsGraph::processWord(std::string word, int sentenceIndex) 
 		WordNode& currentWord = wordsMap.at(word);
 		currentWord.lastInsertedSentenceIndex = sentenceIndex;
 
+		// aumentamos el nivel de poder
+		currentWord.powerCounter = sentencesBag[sentenceIndex].size();
+
 		// primera aparicion de la palabra
 		wordsMap.at(word).appearances++;
 
@@ -57,13 +62,31 @@ WordNode& PowerRelationsGraph::processWord(std::string word, int sentenceIndex) 
 		
 		// en caso de que la palabra exista dos veces en la misma oracion se cuenta como una sola
 		if (currentWord.lastInsertedSentenceIndex != sentenceIndex) {
-		
+			
+			// aumentamos el nivel de poder
+			currentWord.powerCounter += sentencesBag[sentenceIndex].size();
 			currentWord.lastInsertedSentenceIndex = sentenceIndex;
 			wordsMap.at(word).appearances++;
+
 		}	
 	}
 	
 	return wordsMap.at(word);
+}
+
+void PowerRelationsGraph::setPowerPositions() {
+
+	/* 	
+		Objectivo: Procesa el nodo de la forma: Si no existe se agrega al hashmap, 
+		en caso contrario se aumenta la cantidad de apariciones
+	------------------------------------------------------------------------------------
+	Complejidad obtenida: O(n) siendo n la cantidad de palabras ordenadas */
+
+	for (int wordCounter = 0; wordCounter < powerWords.size(); wordCounter++) {
+		WordNode& currentWord = wordsMap.at( powerWords[wordCounter].word );
+		currentWord.powerIndex = wordCounter;
+	}
+
 }
 
 void PowerRelationsGraph::generateSentenceGraph() {
@@ -195,6 +218,37 @@ std::vector<WordNode> PowerRelationsGraph::getPowerWords(int cWords) {
 	return wordsToReturn;
 }
 
+std::vector<WordNode> PowerRelationsGraph::getDominatedWords(std::string pWord) {
+
+	/* 	Objectivo: Debido a que las palabras ya se encuentran ordenadas por puntos de 
+	poder y las palabras ejercen poder sobre las que tienen menos puntos y estan 
+	relacionadas con la palabra dada, podemos decir que ese es el criterio para poder
+	determinar cuales son las palabras dominadas
+	------------------------------------------------------------------------------------
+	Complejidad obtenida: O(log2(n)) siendo n la cantidad de palabras */
+
+	std::vector<WordNode> dominatedWords;
+
+	if ( wordsMap.count(pWord) == 0 )
+		return dominatedWords;
+
+	WordNode& pWordNode = wordsMap.at(pWord);
+	int powerIndex = pWordNode.powerIndex + 1;
+
+	int wordCounter = 0;
+	while ( powerIndex < powerWords.size() && wordCounter < pWordNode.relations.size() ) {
+
+		if ( wordsMap.count( powerWords[powerIndex].word ) >= 1 ) {
+			dominatedWords.push_back( powerWords[powerIndex] );
+			wordCounter++;
+		}
+
+		powerIndex++;
+	}	
+
+	return dominatedWords;
+}
+
 void PowerRelationsGraph::getReady() {
 	
 	/* 	Objetivo: Alojar el llamado de las funciones principales encargadas de generar el grafo y preparar
@@ -215,5 +269,9 @@ void PowerRelationsGraph::getReady() {
 	// Palabras de poder
 	// Complejidad obtenida: O(nlog2(n)) (estable)  *IntroSort*, merging QuickSort, SelectionSort and HeapSort
 	std::sort(powerWords.begin(), powerWords.end(), WordNodeComparator);
+
+	// Palabras Dominadas
+	// Complejidad obtenida: O(n) siendo n la cantidad de palabras
+	setPowerPositions();
 
 }

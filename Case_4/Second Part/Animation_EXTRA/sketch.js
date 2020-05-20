@@ -38,10 +38,10 @@ function draw() {
     for (let i=0; i<myOtherPoints.length; i++)
       myOtherPoints[i].show(myColor[1], offset, angle, xmov2, ymov2);
   
-  xmov1 =  abs( cos(angle) )*(movementRange)+radius;
-  ymov1 =  sin(   angle    )*(movementRange)+radius;
-  xmov2 = -abs( cos(angle) )*(movementRange)+radius;
-  ymov2 = -sin(   angle    )*(movementRange)+radius;
+  xmov1 =  abs( cos(angle) )*radius;
+  ymov1 =  sin(   angle    )*radius;
+  xmov2 = -abs( cos(angle) )*radius;
+  ymov2 = -sin(   angle    )*radius;
   
   angle += 0.1;
 }

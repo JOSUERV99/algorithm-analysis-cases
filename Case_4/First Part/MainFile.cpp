@@ -36,16 +36,16 @@ int main() {
 	PowerRelationsGraph graph(COMPLETE_TEXT_FILENAME, STOP_WORDS_FILENAME); 
 	graph.getReady();
 
-	// // Querying for groups
-	// std::string queryedWord = "costumbre";
-	// int requestedGroups = 4;
-	// auto groups = graph.getPowerGroups( queryedWord, requestedGroups );
-	// show( groups, queryedWord, requestedGroups );
+	// Querying for groups
+	std::string queryedWord = "costumbre";
+	int requestedGroups = 4;
+	auto groups = graph.getPowerGroups( queryedWord, requestedGroups );
+	show( groups, queryedWord, requestedGroups );
 
-	// // Querying for power words
-	// int requestedPowerWords = 5;
-	// auto powerWords = graph.getPowerWords( requestedPowerWords );
-	// show( powerWords );
+	// Querying for power words
+	int requestedPowerWords = 5;
+	auto powerWords = graph.getPowerWords( requestedPowerWords );
+	show( powerWords );
 
 	// Querying for dominated words
 	std::string poweredWord = "hombre";

@@ -27,14 +27,14 @@ void show(vector<CIRCLE_STRUCT>);
 
 class CircleGenerator {
 private:
-	int pointsPerCircle, radius, framesAmount = 0, kCirclesPerGroup;
+	int pointsPerCircle, radius, framesAmount = 0, kCirclesPerGroup, circlesGroups;
 	POINT initialPos;
 	COLOR colors;
 	float distanceRate;
 	
 public:
 
-	vector< vector<CIRCLE_STRUCT> > frames;
+	vector<vector< vector<CIRCLE_STRUCT> >> frames;
 
 	CircleGenerator(
 		int pointsPerCircle, 
@@ -49,7 +49,8 @@ public:
 		kCirclesPerGroup(kCirclesPerGroup),
 		initialPos(initialPos),
 		colors(colors),
-		distanceRate(distanceRate)
+		distanceRate(distanceRate),
+		circlesGroups(2)
 		{}
 	
 	// funcion principal
@@ -59,12 +60,29 @@ public:
 	CIRCLE_STRUCT moveCircle(CIRCLE_STRUCT lastCircle, float xDistance, float yDistance);
 	CIRCLE_STRUCT createCircle( POINT initialPos, int radius);
 	vector<CIRCLE_STRUCT> getReescaledCircles( POINT initialPos, int radius);
+	void showMeta();
 
 };
 
+void  CircleGenerator::showMeta() {
+	/*
+		Objetivo: brindar informacion acerca de la salida del programa
+	*/
+
+	// data shape
+	cout << "Circles Group : " << circlesGroups << endl;
+	cout << "Circles amount for group: " << kCirclesPerGroup << endl;
+	cout << "Points for every circle : " << pointsPerCircle << endl;
+	cout << "Distance Rate : " << distanceRate << endl;
+	cout << "Minimus Radius : " << radius << endl;
+	cout << "initial Position : " << "(" << initialPos.first << "," << initialPos.second << ")" << endl;
+	cout << "Frames amount : " << framesAmount << endl;
+	cout << "Data Shape : [ " << frames.size() << ", " << frames[0].size() << ", " << frames[0][0].size() << "]";
+}
+
 void CircleGenerator::loadFrames() {
 
-	vector<vector<CIRCLE_STRUCT>> frames;
+	vector<vector<vector<CIRCLE_STRUCT>>> frames;
 
 	// para simular la posicion inicial de los circulos del video
 	/*							|
@@ -77,44 +95,27 @@ void CircleGenerator::loadFrames() {
 								|
 	*/
 
-	POINT  firstCircleInitialPos = {initialPos.first + 0, initialPos.second - (radius + 1) };
-	POINT secondCircleInitialPos = {initialPos.first + 0, initialPos.second + (radius + 1) };
-
-	int circleGroupsAmount = 2;
-
-	// se crean los circulos de forma que cada grupo, tenga un circulo dentro de otro
-	frames.push_back( getReescaledCircles( firstCircleInitialPos,  radius ) );
-	frames.push_back( getReescaledCircles( secondCircleInitialPos, radius ) );
-
-
 	// calculamos la cantidad de frames en base al angulo de corrimiento entre cada 
 	// par de puntos entre frame y frame (entre menos distancia, mas cantidad de cuadros)
-	framesAmount = COS_PERIOD / distanceRate;
-
-	CIRCLE_STRUCT lastCircle_FirstGroup, lastCircle_SecondGroup;
+	framesAmount = M_PI / distanceRate;
 
 	float angle = 0.0f; // determina la nueva posicion de los circulos
-	int frameCounter = 2;
+	int frameCounter = 0;
 	while (frameCounter < framesAmount ) {
 
 		// primer grupo de circulos
 		float xmov1 =  abs( cos(angle) ) * radius;
 	  	float ymov1 =  sin(   angle    ) * radius;
 
-	  	lastCircle_FirstGroup = frames[frameCounter - 2][0]; 
-	  	CIRCLE_STRUCT movedCircle_FirstGroup = moveCircle(lastCircle_FirstGroup, xmov1, ymov1);
-	  	lastCircle_FirstGroup = movedCircle_FirstGroup;
+	  	vector<CIRCLE_STRUCT> movedCircle_FirstGroup = getReescaledCircles( {xmov1, ymov1}, radius );
 
 		// segundo grupo de circulos
 	  	float xmov2 = - abs( cos(angle) ) * radius;
 	  	float ymov2 = - sin(   angle    ) * radius;
 
-	  	lastCircle_SecondGroup = frames[frameCounter - 1][1]; 
-	  	CIRCLE_STRUCT movedCircle_SecondGroup = moveCircle(lastCircle_SecondGroup, xmov2, ymov2);
-	  	lastCircle_SecondGroup = movedCircle_SecondGroup;	
+		vector<CIRCLE_STRUCT> movedCircle_SecondGroup = getReescaledCircles( {xmov2, ymov2}, radius );
 
-	  	std::vector<CIRCLE_STRUCT> newFrame;
-
+	  	std::vector<vector<CIRCLE_STRUCT>> newFrame;
 	  	newFrame.push_back(movedCircle_FirstGroup );
 	  	newFrame.push_back(movedCircle_SecondGroup);
 
@@ -192,11 +193,9 @@ int main() {
 	COLOR colors = { {255, 0, 0}, {10, 230, 10}  }; // (rgb mode)
 
 	CircleGenerator cgen(pointsPerCircle, radius, kCirclesPerGroup, initialPos, colors, distanceRate);
-	cgen.loadFrames();
+	cgen.loadFrames(); 
 
-	// cgen.frames para obtener el arreglo de tamanio (cgen.framesAmount)
-	
-	cout << cgen.frames.size() << " frames preloaded!" << endl;
+	cgen.showMeta();
 
 	return EXIT_SUCCESS;
 }

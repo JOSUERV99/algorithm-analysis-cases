@@ -23,11 +23,11 @@ using namespace std;
 #define CIRCLE_STRUCT 	vector<POINT>
 #define COLOR 				vector<tuple<int, int, int>>
 
-void show(vector<CIRCLE_STRUCT>);
+void show(vector<vector<CIRCLE_STRUCT>>);
 
 class CircleGenerator {
 private:
-	int pointsPerCircle, radius, framesAmount = 0, kCirclesPerGroup, circlesGroups;
+	int pointsPerCircle, radius, framesAmount = 0, kCirclesPerGroup, circlesGroups, spaceBetweenReescaledCircles;
 	POINT initialPos;
 	COLOR colors;
 	float distanceRate;
@@ -42,7 +42,8 @@ public:
 		int kCirclesPerGroup,
 		POINT initialPos,
 		COLOR colors,
-		float distanceRate
+		float distanceRate, 
+		int spaceBetweenReescaledCircles
 	): 
 		pointsPerCircle(pointsPerCircle), 
 		radius(radius),
@@ -50,14 +51,13 @@ public:
 		initialPos(initialPos),
 		colors(colors),
 		distanceRate(distanceRate),
-		circlesGroups(2)
+		circlesGroups(2),
+		spaceBetweenReescaledCircles(spaceBetweenReescaledCircles)
 		{}
 	
 	// funcion principal
 	void loadFrames();
 
-	// funciones auxiliares
-	CIRCLE_STRUCT moveCircle(CIRCLE_STRUCT lastCircle, float xDistance, float yDistance);
 	CIRCLE_STRUCT createCircle( POINT initialPos, int radius);
 	vector<CIRCLE_STRUCT> getReescaledCircles( POINT initialPos, int radius);
 	void showMeta();
@@ -72,12 +72,13 @@ void  CircleGenerator::showMeta() {
 	// data shape
 	cout << "Circles Group : " << circlesGroups << endl;
 	cout << "Circles amount for group: " << kCirclesPerGroup << endl;
+	cout << "Space between circles (group): " << spaceBetweenReescaledCircles << endl;
 	cout << "Points for every circle : " << pointsPerCircle << endl;
 	cout << "Distance Rate : " << distanceRate << endl;
 	cout << "Minimus Radius : " << radius << endl;
 	cout << "initial Position : " << "(" << initialPos.first << "," << initialPos.second << ")" << endl;
 	cout << "Frames amount : " << framesAmount << endl;
-	cout << "Data Shape : [ " << frames.size() << ", " << frames[0].size() << ", " << frames[0][0].size() << "]";
+	cout << "Data Shape : [" << frames.size() << ", " << frames[0].size() << ", " << frames[0][0].size() << ", " << frames[0][0][0].size() << "]\n\n";
 }
 
 void CircleGenerator::loadFrames() {
@@ -99,7 +100,7 @@ void CircleGenerator::loadFrames() {
 	// par de puntos entre frame y frame (entre menos distancia, mas cantidad de cuadros)
 	framesAmount = M_PI / distanceRate;
 
-	float angle = 0.0f; // determina la nueva posicion de los circulos
+	float angle = M_PI; // determina la nueva posicion de los circulos
 	int frameCounter = 0;
 	while (frameCounter < framesAmount ) {
 
@@ -128,20 +129,6 @@ void CircleGenerator::loadFrames() {
 	this->frames = frames;
 }
 
-CIRCLE_STRUCT CircleGenerator::moveCircle(CIRCLE_STRUCT lastCircle, float xDistance, float yDistance) {
-
-	CIRCLE_STRUCT movedCircle;
-
-	for (POINT point : lastCircle) {
-		float nextX = point.first + xDistance;
-		float nextY = point.second + yDistance;
-
-		movedCircle.push_back( {nextX, nextY} );
-	}
-
-	return movedCircle;
-}
-
 
 CIRCLE_STRUCT CircleGenerator::createCircle( POINT initialPos, int radius ) {
 
@@ -149,7 +136,7 @@ CIRCLE_STRUCT CircleGenerator::createCircle( POINT initialPos, int radius ) {
 	CIRCLE_STRUCT circle; 
 	
 	// para calcular la distancia entre cada punto del circulo 
-	float distanceBetweenPoints = COS_PERIOD / pointsPerCircle; 
+	float distanceBetweenPoints = M_PI / pointsPerCircle; 
 
 	// distancia acumulada con limite el periodo de coseno
 	float distanceCounter = 0;
@@ -161,7 +148,7 @@ CIRCLE_STRUCT CircleGenerator::createCircle( POINT initialPos, int radius ) {
 		float xPos = cos(distanceCounter) * radius + initialPos.first;
 		float yPos = sin(distanceCounter) * radius + initialPos.second;
 
-		circle.push_back( {xPos, yPos} );
+		circle.push_back( {yPos, xPos} );
 
 		distanceCounter += distanceBetweenPoints;
 	}
@@ -173,7 +160,6 @@ vector<CIRCLE_STRUCT> CircleGenerator::getReescaledCircles( POINT initialPos, in
 
 	vector<CIRCLE_STRUCT> reescaledCircles;
 
-	int spaceBetweenReescaledCircles = 30;
 	int counter = 0;
 	while (counter != kCirclesPerGroup ) {
 		reescaledCircles.push_back( createCircle(initialPos, radius + (counter)*spaceBetweenReescaledCircles ));
@@ -189,22 +175,60 @@ int main() {
 	int radius = 80;
 	int kCirclesPerGroup = 4;
 	float distanceRate = 0.1f;
+	int spaceBetweenReescaledCircles = 20;
 	POINT initialPos = {0,0};
 	COLOR colors = { {255, 0, 0}, {10, 230, 10}  }; // (rgb mode)
 
-	CircleGenerator cgen(pointsPerCircle, radius, kCirclesPerGroup, initialPos, colors, distanceRate);
+	CircleGenerator cgen(pointsPerCircle, radius, kCirclesPerGroup, initialPos, colors, distanceRate, spaceBetweenReescaledCircles);
 	cgen.loadFrames(); 
 
 	cgen.showMeta();
+
+	int counter = 5;
+	for (auto &frame: cgen.frames)
+		if (counter-- != 0)
+			show(frame);
+		else
+			break;
+
+	/*
+
+		Ejemplo de como se usaria en un ciclo infinito una vez, cargada la data
+		para el movimiento de los circulos
+	
+		int frameCounter = 0;
+	
+		while (1==1) {
+			
+			// draw the first circle group
+			with color as cgen.colors[0]
+			for every circle in cgen.frames[ frameCounter ][0] do
+				for (Point p: circle )
+					drawPoint(p);
+			
+			// draw the second circle group
+			with color as cgen.colors[1]
+			for every circle in cgen.frames[ frameCounter ][1] do
+				for (Point p: circle )
+					drawPoint(p);
+
+
+			if (frameCounter == cgen.frames.size()) 
+				frameCounter = 0;
+			
+			frameCounter++;
+		}
+
+	*/
 
 	return EXIT_SUCCESS;
 }
 
 
-void show(vector< vector<CIRCLE_STRUCT> > frames) {
+void show(vector< vector<CIRCLE_STRUCT> > frame) {
 
-		for (vector<CIRCLE_STRUCT> circles: frames) {
-			cout << "####################################################" << endl;
+		for (vector<CIRCLE_STRUCT> circles: frame) {
+			cout << "\n####################################################" << endl;
 			for (CIRCLE_STRUCT circle: circles) {
 				cout << "[ ";
 				for (POINT p : circle)

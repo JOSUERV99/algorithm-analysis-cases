@@ -136,7 +136,7 @@ CIRCLE_STRUCT CircleGenerator::createCircle( POINT initialPos, int radius ) {
 	CIRCLE_STRUCT circle; 
 	
 	// para calcular la distancia entre cada punto del circulo 
-	float distanceBetweenPoints = M_PI / pointsPerCircle; 
+	float distanceBetweenPoints = COS_PERIOD / pointsPerCircle; 
 
 	// distancia acumulada con limite el periodo de coseno
 	float distanceCounter = 0;
@@ -196,7 +196,7 @@ int main() {
 		Ejemplo de como se usaria en un ciclo infinito una vez, cargada la data
 		para el movimiento de los circulos
 	
-		int frameCounter = 0;
+		int frameCounter = 0, incremente = 1;
 	
 		while (1==1) {
 			
@@ -213,10 +213,11 @@ int main() {
 					drawPoint(p);
 
 
-			if (frameCounter == cgen.frames.size()) 
-				frameCounter = 0;
+			if (frameCounter >= cgen.frames.size() || frameCounter < 0) {
+				increment = -incremnent;
+			}
 			
-			frameCounter++;
+			frameCounter += increment;
 		}
 
 	*/

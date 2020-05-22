@@ -30,7 +30,7 @@ private:
 	void setPowerPositions();
 	void generateSentenceGraph();
 	WordNode& processWord(std::string word, int); 
-	std::vector<WordNode>& createGroup(std::string, std::vector<WordNode>&, int, std::string, int);
+	std::vector<WordNode>& createGroup(std::string, std::vector<WordNode>&, int, std::string, int, std::unordered_set<std::string>&);
 };
 
 WordNode& PowerRelationsGraph::processWord(std::string word, int sentenceIndex) {
@@ -136,7 +136,7 @@ void PowerRelationsGraph::generateSentenceGraph() {
 
  }
 
-std::vector<WordNode>& PowerRelationsGraph::createGroup(std::string theWord, std::vector<WordNode> &group, int relationIndex, std::string key, int kAmount) {
+std::vector<WordNode>& PowerRelationsGraph::createGroup(std::string theWord, std::vector<WordNode> &group, int relationIndex, std::string key, int kAmount, std::unordered_set<std::string> &wordRegister) {
 
 	/* 	Objectivo: crear el grupo relacionado de una palabra en base a sus relaciones, 
 		y de forma recursiva segun la palabra elegida, volver a elegir una de esas palabras 
@@ -149,11 +149,14 @@ std::vector<WordNode>& PowerRelationsGraph::createGroup(std::string theWord, std
 		return group;
 	else {
 		auto possibleWord = relations[relationIndex].word;
-		if (possibleWord == theWord || possibleWord == key) 
-			return createGroup(theWord, group, relationIndex + 1, key, kAmount);
+		if (possibleWord == theWord || possibleWord == key || wordRegister.count(possibleWord) == 1 
+			|| relations[relationIndex].powerCounter >= wordsMap.at(theWord).powerCounter ) 
+
+			return createGroup(theWord, group, relationIndex + 1, key, kAmount, wordRegister);
 		else {
 			group.push_back( possibleWord );
-			return createGroup(theWord, group, 0, possibleWord, kAmount - 1 );
+			wordRegister.insert(possibleWord); // registro de la palabra agregada
+			return createGroup(theWord, group, 0, possibleWord, kAmount - 1, wordRegister);
 		}
 	}
 }
@@ -184,8 +187,9 @@ std::vector<std::vector<WordNode>> PowerRelationsGraph::getPowerGroups(std::stri
 
 			std::string key = (*relationIter).word;
 			std::vector<WordNode> processedGroup;
+			std::unordered_set<std::string> groupRegister;
 
-			this->createGroup(pWord, processedGroup, 0, key, sizePerGroup);
+			this->createGroup(pWord, processedGroup, 0, key, sizePerGroup, groupRegister);
 			if (processedGroup.size() == sizePerGroup)
 				groups.push_back(processedGroup);
 			

@@ -37,7 +37,7 @@ int main() {
 	graph.getReady();
 
 	// Querying for groups
-	std::string queryedWord = "costumbre";
+	std::string queryedWord = "hombre";
 	int requestedGroups = 4;
 	auto groups = graph.getPowerGroups( queryedWord, requestedGroups );
 	show( groups, queryedWord, requestedGroups );

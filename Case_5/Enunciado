@@ -1,0 +1,12 @@
+Suponga que hay una pantalla de 1080x920
+y se trazan K líneas saliendo de un punto cualquiera en X=0 ó Y=0
+y llegando a otro punto cualquiera en X=1079 ó Y=919.
+
+Escriba un algoritmo probabilista en C++
+donde dada la lista de las K líneas trazadas
+determine cuáles números de 1 dígito se formaron
+en la visualización 2D de dichas líneas.
+Debe seguir el estándar de código del curso, 
+ser orientado a objetos, buscar la simplicidad
+del algoritmo y la forma en que demuestra que el
+resultado es justificable

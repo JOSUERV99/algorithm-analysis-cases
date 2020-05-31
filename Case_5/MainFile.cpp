@@ -8,12 +8,16 @@
 #include<random>
 #include<time.h>
 
-#define ATTEMPTSNUMBER 10000
+#define ATTEMPTSNUMBER 70000
 #define WIDTH  1080
 #define HEIGHT 920
 
+#define NumbersAmount 10
+#define CandidateLinesAmount 5
+
 #include"Line.cpp"
 #include"LinesGenerator.cpp"
+#include"NumberThinker.cpp"
 #include"NumberShapeFinder.cpp"
 #include"Utils.cpp"
 
@@ -32,13 +36,12 @@ int main() {
 	srand(time(NULL));
 
 	LinesGenerator lgen;
-	std::vector<Line> lines = lgen.giveMeLines();
+	auto lines = lgen.giveMeLines();
 
-	showLines(lines);
-	
-	// std::default_random_engine generator;
-	// std::uniform_int_distribution<int> distribution(1,6);
-	// int dice_roll = distribution(generator);
+	NumberShapeFinder nShapeFinder(lines);
+	nShapeFinder.lookForNumbers(ATTEMPTSNUMBER);
+
+	nShapeFinder.displayResults();
 
 	return EXIT_SUCCESS;
 }

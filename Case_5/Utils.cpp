@@ -2,14 +2,9 @@ namespace Utils {
 
 	void showLines(std::vector<Line> lines) {
 		std::cout << "Lines: {" << std::endl;
-		for (Line l: lines) 
-			printf("{ [%4d, %4d], [%4d, %4d] }\n", l[0].first, l[0].second, l[1].first, l[1].second );
+		for (Line line: lines) 
+			printf("{ [%4d, %4d], [%4d, %4d] }\n", line.xPos1, line.yPos1, line.xPos2, line.yPos2 );
 		std::cout << "}";
-	}
-
-	void showResults(std::string message) {
-
-
 	}
 
 }

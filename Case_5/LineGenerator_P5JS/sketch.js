@@ -61,7 +61,7 @@ function createLine() {
     break;
     case DIAGONAL_FROM_TOP:
       
-      line.push( [rX, 0] );
+      line.push( [rX, HEIGHT] );
       if (coin) 
         line.push( [WIDTH, rY] ); 
       else 

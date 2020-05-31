@@ -8,12 +8,13 @@
 #include<random>
 #include<time.h>
 
-#define Line std::vector<std::pair<int,int>> // line definition
 #define ATTEMPTSNUMBER 10000
+#define WIDTH  1080
+#define HEIGHT 920
 
-#include"NumberShapeFinder.cpp"
-#include"NumberThinker.cpp"
+#include"Line.cpp"
 #include"LinesGenerator.cpp"
+#include"NumberShapeFinder.cpp"
 #include"Utils.cpp"
 
 using namespace Utils;

@@ -1,7 +1,4 @@
 #define DefaultAmount 30
-
-#define WIDTH  1080
-#define HEIGHT 920
 #define DIRECTIONAMOUNT 4
 
 // possible directions mode
@@ -38,30 +35,29 @@ public:
 	  switch(direction) {
 	  
 	    case VERTICAL: 
-	      line.push_back( {0, randomY} );
-	      line.push_back( {WIDTH, randomY} );
+	      line.setFirstPoint( {0, randomY} );
+	      line.setSecondPoint( {WIDTH, randomY} );
 	    break;
 
 	    case HORIZONTAL: 
-	      line.push_back( {randomX, 0} );
-	      line.push_back( {randomX, HEIGHT} );
+	      line.setFirstPoint( {randomX, 0} );
+	      line.setSecondPoint( {randomX, HEIGHT} );
 	    break;
 
 	    case DIAGONAL_FROM_TOP: 
-	      line.push_back( {randomX, 0} );
+	      line.setFirstPoint( {randomX, HEIGHT} );
 	      if (diagonalSideCoin) 
-	        line.push_back( {WIDTH, randomY} ); 
+	        line.setSecondPoint( {WIDTH, randomY} ); 
 	      else 
-	        line.push_back( {0, randomY} ); 
-	           
+	        line.setSecondPoint( {0, randomY} ); 
 	    break;
 
 	    case DIAGONAL_FROM_LEFT:
-	      line.push_back( {0, randomY} );
+	      line.setFirstPoint( {0, randomY} );
 	      if (diagonalSideCoin) 
-	        line.push_back( {randomX, HEIGHT} ); 
+	        line.setSecondPoint( {randomX, HEIGHT} ); 
 	      else 
-	        line.push_back( {randomX, 0} ); 
+	        line.setSecondPoint( {randomX, 0} ); 
 	      
 	    break;
 	    default:

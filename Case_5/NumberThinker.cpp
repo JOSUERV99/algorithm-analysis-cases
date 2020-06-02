@@ -1,16 +1,27 @@
+
 class NumberThinker {
 public:
 	NumberThinker() {}
 
 	bool perceiveNumber(int number, std::vector<Line> candidateLines) {
 
-		int diagonalIndex = -1, verticalIndex = -1, horizontalIndex = -1;
-		int verticalCounter = -1, horizontalCounter = -1;
+		int firstDistance = 0, secondDistance = 0, thirdDistance = 0;
 
-		bool vertical = false, horizontal =  false, diagonal = false;
 		switch(number){
 
 			case 0:
+			/*  ___
+				|	 |
+				|___|
+			*/
+
+			firstDistance = abs(candidateLines[0].xPos1  - candidateLines[2].xPos1);
+			secondDistance = abs(candidateLines[1].yPos1 - candidateLines[3].xPos1);
+
+			return 
+				candidateLines[0].type == VERTICAL   && candidateLines[2].type == VERTICAL &&
+				candidateLines[1].type == HORIZONTAL && candidateLines[3].type == HORIZONTAL &&
+				firstDistance < secondDistance;
 
 			break;
 			case 1:
@@ -20,18 +31,12 @@ public:
 					|
 				*/
 
-			for (int counter = 0; counter < CandidateLinesAmount; counter++) {
-				int direction = -1;
-				if ( candidateLines[counter].isDiagonal(direction) )
-					if (direction == DIAGONAL_BOTTOM_TO_RIGHT)
-						diagonalIndex = counter;
-				else if ( candidateLines[counter].isVertical() )
-					verticalIndex = counter;
-			}
+			firstDistance = abs(candidateLines[1].xPos2 - candidateLines[1].xPos1);
 
-			return diagonalIndex != verticalIndex && 
-					candidateLines[diagonalIndex].hasIntersection(candidateLines[verticalIndex]);
-	
+			return 
+				  candidateLines[0].type == VERTICAL && candidateLines[1].type == BOTTOM_TO_RIGHT &&
+				  firstDistance < 150;
+		
 			break;
 			case 2:
 				/*
@@ -40,15 +45,14 @@ public:
 				 |__	 
 				*/
 
+			firstDistance  = abs(candidateLines[0].xPos1 - candidateLines[1].xPos1); // VERTICAL DISTANCE
+			secondDistance = abs(candidateLines[2].yPos1 - candidateLines[3].yPos1); // HORIZONTAL DISTANCE (CENTER, TOP)
+			thirdDistance  = abs(candidateLines[2].yPos1 - candidateLines[4].yPos1); // HORIZONTAL DISTANCE (CENTER, BOTTOM)
 
-				for (int counter = 0; counter < CandidateLinesAmount; counter++) {
-					if ( candidateLines[counter].isVertical()  )
-						verticalCounter++;
-					else if ( candidateLines[counter].isHorizontal() ) 
-						horizontalCounter++;
-				}
-
-				return verticalCounter == 2 && horizontalCounter == 3;
+			return candidateLines[0].type == VERTICAL && candidateLines[1].type == VERTICAL &&
+					 candidateLines[2].type == HORIZONTAL &&  candidateLines[3].type == HORIZONTAL &&
+					 candidateLines[4].type == HORIZONTAL && abs(firstDistance - secondDistance) < 300 &&
+					 abs(secondDistance -  thirdDistance) < 300;
 
 			break;	
 			case 3:
@@ -59,14 +63,12 @@ public:
 				
 			*/
 
-			for (int counter = 0; counter < CandidateLinesAmount; counter++) {
-				if ( candidateLines[counter].isVertical()  )
-					verticalCounter++;
-				else if ( candidateLines[counter].isHorizontal() ) 
-					horizontalCounter++;
-			}
+			firstDistance   = abs(candidateLines[2].yPos1 - candidateLines[3].yPos1); // HORIZONTAL DISTANCE (CENTER, TOP)
+			secondDistance  = abs(candidateLines[2].yPos1 - candidateLines[4].yPos1); // HORIZONTAL DISTANCE (CENTER, BOTTOM)
 
-			return verticalCounter == 1 && horizontalCounter == 3;
+			return candidateLines[0].type == VERTICAL && candidateLines[1].type == VERTICAL &&
+					 candidateLines[2].type == HORIZONTAL &&  candidateLines[3].type == HORIZONTAL &&
+					 candidateLines[4].type == HORIZONTAL && abs(firstDistance - secondDistance) < 300;
 
 			break;
 			case 4:	
@@ -76,18 +78,11 @@ public:
 				  |	
 			*/
 
-			for (int counter = 0; counter < CandidateLinesAmount; counter++) {
-				int direction = -1;
-				if ( candidateLines[counter].isVertical() )
-					vertical   = true;
-				else if ( candidateLines[counter].isHorizontal() )
-					horizontal = true;
-				else if ( candidateLines[counter].isDiagonal(direction) )
-					if (direction == DIAGONAL_BOTTOM_TO_RIGHT)
-						diagonal   = true;
-			}
+			firstDistance = candidateLines[1].xPos2 - candidateLines[1].xPos1;
 
-			return vertical && diagonal && horizontal;
+			return candidateLines[0].type == VERTICAL && candidateLines[1].type == BOTTOM_TO_RIGHT &&
+					 candidateLines[2].type == HORIZONTAL && firstDistance < 150 && firstDistance >= 0 &&
+					 firstDistance < 250;
 
 			break;
 			case 5:
@@ -96,14 +91,14 @@ public:
 				 __|
 			*/
 
-			for (int counter = 0; counter < CandidateLinesAmount; counter++) {
-				if ( candidateLines[counter].isVertical()  )
-					verticalCounter++;
-				else if ( candidateLines[counter].isHorizontal() ) 
-					horizontalCounter++;
-			}
+			firstDistance  = abs(candidateLines[0].xPos1 - candidateLines[1].xPos1); // VERTICAL DISTANCE
+			secondDistance = abs(candidateLines[2].yPos1 - candidateLines[3].yPos1); // HORIZONTAL DISTANCE (CENTER, TOP)
+			thirdDistance  = abs(candidateLines[2].yPos1 - candidateLines[4].yPos1); // HORIZONTAL DISTANCE (CENTER, BOTTOM)
 
-			return verticalCounter == 2 && horizontalCounter == 3;
+			return candidateLines[0].type == VERTICAL && candidateLines[1].type == VERTICAL &&
+					 candidateLines[2].type == HORIZONTAL &&  candidateLines[3].type == HORIZONTAL &&
+					 candidateLines[4].type == HORIZONTAL && abs(firstDistance - secondDistance) < 300 &&
+					 abs(secondDistance -  thirdDistance) < 300;
 
 			break;
 			case 6:
@@ -112,14 +107,14 @@ public:
  				|__|     
 			*/
 
-			for (int counter = 0; counter < CandidateLinesAmount; counter++) {
-				if ( candidateLines[counter].isVertical()  )
-					verticalCounter++;
-				else if ( candidateLines[counter].isHorizontal() ) 
-					horizontalCounter++;
-			}
+			firstDistance  = abs(candidateLines[0].xPos1 - candidateLines[1].xPos1); // VERTICAL DISTANCE
+			secondDistance = abs(candidateLines[2].yPos1 - candidateLines[3].yPos1); // HORIZONTAL DISTANCE (CENTER, TOP)
+			thirdDistance  = abs(candidateLines[2].yPos1 - candidateLines[4].yPos1); // HORIZONTAL DISTANCE (CENTER, BOTTOM)
 
-			return verticalCounter == 2 && horizontalCounter == 3;
+			return candidateLines[0].type == VERTICAL && candidateLines[1].type == VERTICAL &&
+					 candidateLines[2].type == HORIZONTAL &&  candidateLines[3].type == HORIZONTAL &&
+					 candidateLines[4].type == HORIZONTAL && abs(firstDistance - secondDistance) < 300 &&
+					 abs(secondDistance -  thirdDistance) < 300;
 
 			break;
 			case 7:
@@ -128,18 +123,11 @@ public:
 				 / 
 			*/
 
-			for (int counter = 0; counter < CandidateLinesAmount; counter++) {
-				int direction = -1;
-				if ( candidateLines[counter].isDiagonal(direction) )
-					if (direction == DIAGONAL_BOTTOM_TO_RIGHT)
-						diagonalIndex = counter;
-				else if ( candidateLines[counter].isHorizontal() )
-					horizontalIndex = counter;
-			}
+			firstDistance = abs(candidateLines[1].xPos2 - candidateLines[1].xPos1);
 
-			return diagonalIndex != horizontalIndex && 
-					candidateLines[diagonalIndex].hasIntersection(candidateLines[horizontalIndex]);
-
+			return 
+				  candidateLines[0].type == HORIZONTAL && candidateLines[1].type == BOTTOM_TO_RIGHT
+				  && firstDistance < 600;
 			break;
 			case 8:
 			/*	 ___
@@ -147,14 +135,15 @@ public:
             |___|
 			*/
 
-			for (int counter = 0; counter < CandidateLinesAmount; counter++) {
-				if ( candidateLines[counter].isVertical()  )
-					verticalCounter++;
-				else if ( candidateLines[counter].isHorizontal() ) 
-					horizontalCounter++;
-			}
+			firstDistance  = abs(candidateLines[0].xPos1 - candidateLines[2].xPos1);  // VERTICALES
+			secondDistance = abs(candidateLines[1].yPos1 - candidateLines[3].xPos1);  // HORIZONTALES
+			thirdDistance  = abs(candidateLines[4].yPos1 - candidateLines[3].yPos2);  // LINEA DEL CENTRO
 
-			return verticalCounter == 2 && horizontalCounter == 3;
+			return 
+				candidateLines[0].type == VERTICAL   && candidateLines[2].type == VERTICAL &&
+				candidateLines[1].type == HORIZONTAL && candidateLines[3].type == HORIZONTAL &&
+				candidateLines[4].type == HORIZONTAL && firstDistance < secondDistance &&
+				thirdDistance < 200;
 
 			break;
 			case 9:
@@ -163,19 +152,18 @@ public:
                 |
 			*/
 
-			for (int counter = 0; counter < CandidateLinesAmount; counter++) {
-				if ( candidateLines[counter].isVertical()  )
-					verticalCounter++;
-				else if ( candidateLines[counter].isHorizontal() ) 
-					horizontalCounter++;
-			}
+			firstDistance  = abs(candidateLines[0].xPos1 - candidateLines[2].xPos1);  // VERTICALES
+			secondDistance = abs(candidateLines[1].yPos1 - candidateLines[3].xPos1);  // HORIZONTALES
 
-			return verticalCounter == 2 && horizontalCounter == 2;
+			return 
+				candidateLines[0].type == VERTICAL   && candidateLines[2].type == VERTICAL &&
+				candidateLines[1].type == HORIZONTAL && candidateLines[3].type == HORIZONTAL &&
+				abs(firstDistance - secondDistance)  < 250;
 
 			break;
 			default:
-				std::cout << "?" << std::endl;
-			break;
+				// nothing to to
+				break;
 		}
 
 		return false;

@@ -1,16 +1,10 @@
-#define DefaultAmount 30
-#define DIRECTIONAMOUNT 4
-
-// possible directions mode
-const int VERTICAL = 0;
-const int HORIZONTAL = 1;
-const int DIAGONAL_FROM_TOP = 2;
-const int DIAGONAL_FROM_LEFT = 3;
+#define DIRECTIONTYPES 3
+#define DIAGONALTYPES 4
 
 class LinesGenerator {
 public:
 
-	std::vector<Line> giveMeLines(int linesAmount = DefaultAmount) {
+	std::vector<Line> giveMeLines(int linesAmount) {
 
 		std::vector<Line> generatedLines;
 		
@@ -24,45 +18,48 @@ public:
 
 		Line line;
 
-		int direction = rand() % DIRECTIONAMOUNT ; // choose direction
+		int direction = rand() % DIRECTIONTYPES ; // choose direction
 
 		int randomX = rand() % WIDTH;
 		int randomY = rand() % HEIGHT;
-
-		// to choose the side for diagonals
-		bool diagonalSideCoin = (rand() % 2) == 0;
-		  
-	  switch(direction) {
+  
+	   switch(direction) {
 	  
 	    case VERTICAL: 
-	      line.setFirstPoint( {0, randomY} );
-	      line.setSecondPoint( {WIDTH, randomY} );
+	    	line.setFirstPoint( {randomX, 0} );
+	      line.setSecondPoint( {randomX, HEIGHT} );
+	      line.type = VERTICAL;
 	    break;
 
 	    case HORIZONTAL: 
-	      line.setFirstPoint( {randomX, 0} );
-	      line.setSecondPoint( {randomX, HEIGHT} );
-	    break;
-
-	    case DIAGONAL_FROM_TOP: 
-	      line.setFirstPoint( {randomX, HEIGHT} );
-	      if (diagonalSideCoin) 
-	        line.setSecondPoint( {WIDTH, randomY} ); 
-	      else 
-	        line.setSecondPoint( {0, randomY} ); 
-	    break;
-
-	    case DIAGONAL_FROM_LEFT:
 	      line.setFirstPoint( {0, randomY} );
-	      if (diagonalSideCoin) 
-	        line.setSecondPoint( {randomX, HEIGHT} ); 
-	      else 
-	        line.setSecondPoint( {randomX, 0} ); 
-	      
+	      line.setSecondPoint( {WIDTH, randomY} );
+	      line.type = HORIZONTAL;
 	    break;
-	    default:
-	    	// nothing to do
-	    	break;
+
+	    case DIAGONAL: 
+
+	    	int diagonalType = rand() % DIAGONALTYPES + 2;
+	    	line.type = diagonalType ;
+			
+			if (diagonalType ==  BOTTOM_TO_LEFT) {
+    			line.setFirstPoint( {randomX, HEIGHT} );
+      		line.setSecondPoint( {0, randomY} ); 
+	     	} 
+	     	else if (diagonalType == BOTTOM_TO_RIGHT) {
+      		line.setFirstPoint( {randomX, HEIGHT} );
+      		line.setSecondPoint( {WIDTH, randomY} );
+	      } 
+	      else if (diagonalType == TOP_TO_LEFT) {
+	      	line.setFirstPoint( {randomX, 0} );
+	      	line.setSecondPoint( {0, randomY} );
+	      } 
+	      else if (diagonalType == TOP_TO_RIGHT) {
+	      	line.setFirstPoint( {randomX, 0} );
+	      	line.setSecondPoint( {WIDTH, randomY} );
+	      }
+
+	    break;
 	  }
 
 		return line;

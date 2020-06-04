@@ -38,6 +38,11 @@ int main() {
 
 	LinesGenerator lgen;
 	std::vector<Line> lines = lgen.giveMeLines(LINESAMOUNT);
+
+	NumberShapeFinder nShapeFinder(lines);
+	nShapeFinder.generateProbabilityDistribution();
+
+
 	// {
 	// 	Line({ 282,    0}, {   0,  281}, TOP_TO_LEFT),
 	// 	Line({   0,  170}, {1080,  170}, HORIZONTAL ),
@@ -65,11 +70,11 @@ int main() {
 	9 -> 0
 	*/
 
-	NumberShapeFinder nShapeFinder(lines);
-	nShapeFinder.lookForNumbers(ATTEMPTSNUMBER);
+	// NumberShapeFinder nShapeFinder(lines);
+	// nShapeFinder.lookForNumbers(ATTEMPTSNUMBER);
 
-	showLines(lines);
-	nShapeFinder.displayResults();
+	// showLines(lines);
+	// nShapeFinder.displayResults();
 
 	return EXIT_SUCCESS;
 }

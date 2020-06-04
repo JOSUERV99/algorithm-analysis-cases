@@ -51,6 +51,14 @@ public:
 		return type >= 2;
 	}
 
+	bool isHorizontal() {
+		return type == HORIZONTAL;
+	}
+
+	bool isVertical() {
+		return type == VERTICAL;
+	}
+
 	bool equals(Line otherLine) {
 		return xPos1 == otherLine.xPos1 &&
 				 xPos2 == otherLine.xPos2 && 

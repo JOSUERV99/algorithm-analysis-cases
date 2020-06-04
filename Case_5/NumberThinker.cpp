@@ -5,6 +5,13 @@ public:
 
 	bool perceiveNumber(int number, std::vector<Line> candidateLines) {
 
+		/*
+			Busca en base a una forma absoluta de un numero, trata de reconocerlo usando
+			el set de lineas que obtiene por parametro
+
+			Complejidad: O(c)
+		*/
+
 		int firstDistance = 0, secondDistance = 0, thirdDistance = 0;
 
 		switch(number){

@@ -71,10 +71,10 @@ int main() {
 	*/
 
 	// NumberShapeFinder nShapeFinder(lines);
-	// nShapeFinder.lookForNumbers(ATTEMPTSNUMBER);
+	nShapeFinder.lookForNumbers(ATTEMPTSNUMBER);
 
-	// showLines(lines);
-	// nShapeFinder.displayResults();
+	showLines(lines);
+	nShapeFinder.displayResults();
 
 	return EXIT_SUCCESS;
 }

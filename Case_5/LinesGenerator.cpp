@@ -3,10 +3,15 @@
 
 class LinesGenerator {
 public:
-
 	std::vector<Line> giveMeLines(int linesAmount) {
 
-		std::vector<Line> generatedLines;
+		/*
+			Genera un set de lineas usando *getRandomLine() por tamanio definido por *linesAmount
+
+			Complejidad: O(c) siendo c igual a linesAmount 
+		*/
+
+		std::vector<Line> generatedLines;	
 		
 		for (int _ = 0; _ < linesAmount; _++)
 			generatedLines.push_back( getRandomLine() );
@@ -15,6 +20,14 @@ public:
 	}
 
 	Line getRandomLine() {
+
+		/*
+			Se encarga de generar una linea en una direccion aleatoria, tomando
+			dos puntos aleatorios* para formar una recta comprendida entre
+			WIDTH y HEIGHT
+
+			Complejidad: O(c) 
+		*/
 
 		Line line;
 

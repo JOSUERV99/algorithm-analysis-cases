@@ -1,5 +1,6 @@
+
 #define DEFAULTATTEMPTSNUMBER 10000
-#define DEFAULTDISTANCECALCULUSAMOUNT 100
+#define DIRECTIONMODES 3
 
 // minimo de lineas necesarias para poder
 // representar un numero entre 0 y 10 en 2D
@@ -18,15 +19,16 @@ const int NEEDEDLINES[] = {
 
 class NumberShapeFinder {
 private:
-	// atributos
 
+	// atributos
 	int approximateNumbersAmount[NUMBERSAMOUNT]; // registra la cantidad de numeros aproximados encontrados
 	std::vector<Line> lines; 							// contiene las lineas generadas por LineGenerator 
 	NumberThinker thinker;								// se encarga de tomar en cuenta la formas absolutas de un numero
 	int totalPoints;										// cantidad de puntos totales (Distribucion de probabilidad)
 
-	int probabilityDistribution[NUMBERSAMOUNT];  // registra la cantidad de puntos de posible aparicion 
-																// segun el set de lineas dadas
+	int numbersProbDistribution[NUMBERSAMOUNT];    // registra la cantidad de puntos de posible aparicion 
+																  // segun el set de lineas dadas
+	int directionProbDistribution[DIRECTIONMODES]; // almacena la distribucion de las lineas
 
 public:
 	// constructor
@@ -34,7 +36,12 @@ public:
 		
 		thinker = NumberThinker();
 		for (int counter = 0; counter < NUMBERSAMOUNT; counter++)
-			approximateNumbersAmount[counter] = probabilityDistribution[counter] = 0;
+			approximateNumbersAmount[counter] = numbersProbDistribution[counter] = 0;
+
+		for (int counter=0;  
+				counter < DIRECTIONMODES; 
+				directionProbDistribution[counter] = 0, 
+				counter++);
 
 	}
 
@@ -49,10 +56,18 @@ public:
 		*/
 
 		adjustPDByLinesDirection();
-		
-		adjustPBByDistanceBetweenLines();
-		
 		setTotalPoints();
+
+		std::sort( 
+			lines.begin(), 
+			lines.end(), 
+			[&] (const Line& l1, const Line& l2) {
+				return l1.type < l2.type;
+			} 
+		);
+
+		Utils::showLines(lines);
+
 	}
 
 	float randomFloat() {
@@ -74,9 +89,9 @@ public:
 			Complejidad: O(c) siendo c igual a NUMBERSAMOUNT
 		*/
 
-		for (int counter = 0; counter < NUMBERSAMOUNT; counter++) {
-			totalPoints += probabilityDistribution[counter];
-		}
+		for (int counter = 0; counter < NUMBERSAMOUNT; counter++) 
+			totalPoints += numbersProbDistribution[counter];
+
 	}
 
 	void showDistribution() {
@@ -86,82 +101,19 @@ public:
 
 			Complejidad: O(c) siendo c igual a NUMBERSAMOUNT
 		*/
+		
+		for (int counter = 0; counter < DIRECTIONMODES; counter++) {
 
-		float sum = 0;
+			float currentProbability = (float) directionProbDistribution[ counter ] / (float) lines.size();
+			std::cout << "Direccion: [ " << counter << " ] : " << currentProbability << std::endl; 
+		}
+
 		for (int counter = 0; counter < NUMBERSAMOUNT; counter++) {
 
-			float currentProbability = (float) probabilityDistribution[ counter ] / (float) totalPoints;
+			float currentProbability = (float) numbersProbDistribution[ counter ] / (float) totalPoints;
 			std::cout << "Number: [ " << counter << " ] : " << currentProbability << std::endl; 
-			sum += currentProbability;
 		}
 
-		std::cout << "\n\n Prob -> " << sum << std::endl;
-
-	}
-
-	void adjustPBByDistanceBetweenLines( ) {
-
-		/* 
-			Aumenta valores en el arreglo de puntos por numero tomando en
-			cuenta la distancia entre las lineas
-
-			Complejidad: O(c) siendo c igual a DEFAULTDISTANCECALCULUSAMOUNT
-		*/
-
-		int linesAmount = 2; // cantidad de lineas para medir distancias
-
-		for (int counter= 0; counter < DEFAULTDISTANCECALCULUSAMOUNT; counter++) {
-
-			std::vector<Line> choosedLines;
-
-			for (int counter = 0; counter < linesAmount; counter++) {
-				choosedLines.push_back( lines[rand() % lines.size()] );
-			}
-
-			if ( choosedLines[0].isVertical() && choosedLines[1].isVertical() ||
-				choosedLines[1].isVertical() && choosedLines[0].isVertical() ) 
-			{
-				if ( abs(choosedLines[0].xPos1 - choosedLines[0].xPos2) < 200  ) {
-					
-					// aumentamos la probabilidad de las lineas que necesitan
-					// dos lineas verticales a cierta distancia
-
-					for (int i=0; i<NUMBERSAMOUNT; i++)
-						if (i != 1 && i != 7) 
-							probabilityDistribution[i]++;
-				}
-			}
-			else if (choosedLines[0].isHorizontal() && choosedLines[1].isHorizontal() ) {
-
-				// aumentamos la probabilidad de las lineas que necesitan
-				// dos lineas horizontales a cierta distancia
-
-				for (int i=0; i<NUMBERSAMOUNT; i++)
-						if (i != 1 && i != 7) 
-							probabilityDistribution[i]++;
-			}
-			else if ( choosedLines[0].isDiagonal() && choosedLines[1].isHorizontal() ||
-				choosedLines[1].isDiagonal() && choosedLines[0].isHorizontal()) {
-
-				// aumentamos la probabilidad de las lineas que necesitan
-				// una horizontal y diagonal a cierta distancia
-
-				if ( abs(choosedLines[0].yPos1 - choosedLines[0].yPos2) < 300  ) {
-					probabilityDistribution[7];
-				}
-
-			}
-			else if ( choosedLines[0].isDiagonal() && choosedLines[1].isVertical() ||
-				choosedLines[1].isDiagonal() && choosedLines[0].isVertical()) {
-
-				// aumentamos la probabilidad de las lineas que necesitan
-				// una vertical y diagonal a cierta distancia
-
-				if ( abs(choosedLines[0].xPos1 - choosedLines[0].xPos2) < 300  ) {
-					probabilityDistribution[1]++;
-				}
-			}
-		}
 	}
 
 	void adjustPDByLinesDirection() {
@@ -174,22 +126,32 @@ public:
 		*/
 
 		for (Line line: lines) {
-			if ( line.isDiagonal() && line.type == BOTTOM_TO_RIGHT ) {				
-				// aumentamos la probabilidad de los numeros que tienen diagonales
-				probabilityDistribution[7]++;
-				probabilityDistribution[1]++;
+
+			if ( line.isDiagonal() ) {
+
+				directionProbDistribution[DIAGONAL]++;
+
+					// aumentamos la probabilidad de los numeros que tienen diagonales
+					numbersProbDistribution[7]++;
+					numbersProbDistribution[1]++;
 			} 
 			else if ( line.isVertical() ) {
+
+				directionProbDistribution[VERTICAL]++;
+
 				// aumentamos la probabilidad de los numeros que tienen verticales
 				for (int i=0; i<NUMBERSAMOUNT; i++)
-					if (i != 7) // unico numero que no tiene verticales
-						probabilityDistribution[i]++;
+					if (i != 7) // unicos numeros que no tienen verticales
+						numbersProbDistribution[i]++;
+			
+			} else {
 
-			} else if ( line.isHorizontal() ) {
+				directionProbDistribution[HORIZONTAL]++;
+
 				// aumentamos la probabilidad de los numeros que tienen horizontales
 				for (int i=0; i<NUMBERSAMOUNT; i++)
 					if (i != 1) // unico numero que no tiene verticales
-						probabilityDistribution[i]++;
+						numbersProbDistribution[i]++;
 			}
 		}
 	}
@@ -202,35 +164,44 @@ public:
 
 			Complejidad: O(c) siendo c igual a attemptsNumber
 		*/
-		
-		std::cout << "Repeating process: " << attemptsNumber << " times" << std::endl;	
+			
 		std::unordered_map<int, std::unordered_set<std::string>> lineRegistry;
 
 		while (attemptsNumber--) {
 
-			// 1. Elegimos un numero candidato a reconocer
-			int candidateToRecognize = chooseNumber( randomFloat() );
+			// 1. Elegimos un numero candidato a reconocer en base a la distribucion
+			int candidateToRecognize = 
+				chooseBetweenDistribution ( randomFloat(), numbersProbDistribution, totalPoints, NUMBERSAMOUNT );
 
 			// 2. Elegimos un sample o muestra para probar
-			std::vector<Line> randomSelectedLines;
-			std::vector<int> linesIndexes;
+			std::vector<Line> selectedLines;
+			std::vector<int>  linesIndexes;
 
 			int selectCounter = 0;
 
-			while (selectCounter++ != NEEDEDLINES[candidateToRecognize]) {
-	
-				int lineSelectedIndex = rand() % lines.size();
-				randomSelectedLines.push_back( lines[ lineSelectedIndex ] );	
-				linesIndexes.push_back(lineSelectedIndex);
+			while ( selectCounter++ != NEEDEDLINES[candidateToRecognize] ) {
+				
+				int randomType = 
+					chooseBetweenDistribution ( randomFloat(), directionProbDistribution, lines.size(), DIRECTIONMODES );
+
+				// elegir linea segun el tipo elegido
+				int accrued = 0;
+				for (int counter = 0; counter < DIRECTIONMODES && counter != randomType; counter++) 
+					accrued += directionProbDistribution[counter];
+				
+				int lineIndex = accrued + rand() % directionProbDistribution[ randomType ];
+
+				selectedLines.push_back( lines[ lineIndex ] );
+				linesIndexes .push_back(      lineIndex     );
 
 			}
 
 			// 3. Checamos que cumpla con las condicion de forma del numero en 2D
-			bool recognized = thinker.perceiveNumber(candidateToRecognize, randomSelectedLines);
+			bool recognized = thinker.perceiveNumber(candidateToRecognize, selectedLines);
 
 			// 4. Si, se reconoce como un numero se aumentan las apariciones, en el caso de usar 
 			// al menos una linea diferente
-			std::string lineKey = getKey(candidateToRecognize, linesIndexes); 
+			auto lineKey = getKey(linesIndexes); 
 
 			if (recognized && lineRegistry[ candidateToRecognize ].count( lineKey ) == 0 ) {
 				
@@ -240,7 +211,7 @@ public:
 		}
 	}
 
-	int chooseNumber(float randomNumber) {
+	int chooseBetweenDistribution(float randomNumber, int* distribution, int totalDistribution, int limit) {
 
 		/* 
 			Tomando en cuenta el valor random generado, toma en cuenta un valor acumulado 
@@ -251,10 +222,11 @@ public:
 
 		float accrued = 0;
 
-		for (int counter = 0; counter < NUMBERSAMOUNT; counter++) {
+		for (int counter = 0; counter < limit; counter++) {
 
-			float currentProbability = getPossibility(counter);
-			
+			float currentProbability = 
+				(float) distribution[ counter ] / (float) totalDistribution;
+
 			if ( accrued + currentProbability > randomNumber) 
 				return counter;
 			else 
@@ -262,10 +234,10 @@ public:
 			
 		}
 
-		return -1;
+		return 0;
 	}
 
-	std::string getKey(int n, std::vector<int> linesIndexes) {
+	std::string getKey(std::vector<int> linesIndexes) {
 
 		/* 
 			#Util: para registrar la cantidad de numeros generados, toma en cuenta 
@@ -275,23 +247,12 @@ public:
 			Complejidad: O(c) siendo c igual a NEEDEDLINES *ver constante arriba*
 		*/
 
-		std::string key = "";
+		std::string key;
 
-		for (int counter = 0; counter < NEEDEDLINES[n]; counter++) 
-			key += linesIndexes[counter];
-		
+		for (int value: linesIndexes)
+			key += value;
+
 		return key;
-	}
-
-	float getPossibility(int n) {
-		/*
-			Retorna el porcentaje correspondiente segun el valor n dado, usando la distribucion de
-			probabilidad
-
-			Complejidad: O(c)	
-		*/
-
-		return (float) probabilityDistribution[n] / (float) totalPoints;
 	}
 
 	void displayResults() {
@@ -305,7 +266,7 @@ public:
 
 		std::cout << "Approximated Amount finded " << std::endl;
 		for (int counter = 0; counter < NUMBERSAMOUNT; counter++)
-			printf("(%1.3f%) -> %d : %d appearances approximately \n", getPossibility(counter), counter, approximateNumbersAmount[counter]);
+			printf("(%1.3f%) -> %d : %d appearances approximately \n", numbersProbDistribution[counter] / (float) totalPoints, counter, approximateNumbersAmount[counter]);
 	}
 	
 };

@@ -71,7 +71,11 @@ public:
 				 yPos2 == otherLine.xPos1; 
  	}
 
- 	void show() {
- 		printf("[[%4d, %4d], [%4d, %4d]],\n", xPos1, yPos1, xPos2, yPos2);
+ 	void show(bool direction = false) {
+ 		if (direction)
+ 			printf("[[%4d, %4d], [%4d, %4d]] (%s),\n", xPos1, yPos1, xPos2, yPos2, 
+ 				type == HORIZONTAL ? "Horizontal" : type == VERTICAL ? "Vertical" : "Diagonal");
+ 		else
+ 			printf("[[%4d, %4d], [%4d, %4d]],\n", xPos1, yPos1, xPos2, yPos2);
  	}
 };

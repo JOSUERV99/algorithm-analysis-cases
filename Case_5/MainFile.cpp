@@ -8,19 +8,20 @@
 #include<utility>
 #include<random>
 #include<time.h>
+#include<algorithm>
 
-#define ATTEMPTSNUMBER 1000
+#define ATTEMPTSNUMBER 10000
 #define WIDTH  1080
 #define HEIGHT 920
 
 #define NUMBERSAMOUNT 10
-#define LINESAMOUNT 5
+#define LINESAMOUNT 30
 
 #include"Line.cpp"
+#include"Utils.cpp"
 #include"LinesGenerator.cpp"
 #include"NumberThinker.cpp"
 #include"NumberShapeFinder.cpp"
-#include"Utils.cpp"
 
 using namespace Utils;
 
@@ -37,19 +38,10 @@ int main() {
 	srand(time(NULL));
 
 	LinesGenerator lgen;
-	std::vector<Line> lines = lgen.giveMeLines(LINESAMOUNT);
+	NumberShapeFinder nShapeFinder( lgen.giveMeLines(LINESAMOUNT) );
 
-	NumberShapeFinder nShapeFinder(lines);
 	nShapeFinder.generateProbabilityDistribution();
-
-
-	// {
-	// 	Line({ 282,    0}, {   0,  281}, TOP_TO_LEFT),
-	// 	Line({   0,  170}, {1080,  170}, HORIZONTAL ),
-	// 	Line({ 494,    0}, {   0,  248}, TOP_TO_LEFT),
-	// 	Line({ 535,  920}, {1080,   19}, BOTTOM_TO_RIGHT),
-	// 	Line({   0,  644}, {1080,  644}, HORIZONTAL)
-	// };
+	nShapeFinder.showDistribution();
 
 	/*
 	[[ 458,  920], [1080,  423]],
@@ -70,10 +62,7 @@ int main() {
 	9 -> 0
 	*/
 
-	// NumberShapeFinder nShapeFinder(lines);
 	nShapeFinder.lookForNumbers(ATTEMPTSNUMBER);
-
-	showLines(lines);
 	nShapeFinder.displayResults();
 
 	return EXIT_SUCCESS;

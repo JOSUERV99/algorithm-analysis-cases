@@ -15,12 +15,11 @@
 #define HEIGHT 920
 
 #define NUMBERSAMOUNT 10
-#define LINESAMOUNT 30
+#define LINESAMOUNT 50
 
 #include"Line.cpp"
 #include"Utils.cpp"
 #include"LinesGenerator.cpp"
-#include"NumberThinker.cpp"
 #include"NumberShapeFinder.cpp"
 
 using namespace Utils;
@@ -38,32 +37,14 @@ int main() {
 	srand(time(NULL));
 
 	LinesGenerator lgen;
+
 	NumberShapeFinder nShapeFinder( lgen.giveMeLines(LINESAMOUNT) );
-
 	nShapeFinder.generateProbabilityDistribution();
-	nShapeFinder.showDistribution();
-
-	/*
-	[[ 458,  920], [1080,  423]],
-	[[1069,  920], [1080,  845]],
-	[[  41,  920], [1080,  494]],
-	[[ 988,    0], [ 988,  920]],
-	[[   0,  801], [1080,  801]]
-
-	0 -> 0
-	1 -> 1
-	2 -> 0
-	3 -> 0
-	4 -> 1
-	5 -> 0
-	6 -> 0
-	7 -> 1
-	8 -> 0
-	9 -> 0
-	*/
 
 	nShapeFinder.lookForNumbers(ATTEMPTSNUMBER);
 	nShapeFinder.displayResults();
+
+	nShapeFinder.showDistribution();
 
 	return EXIT_SUCCESS;
 }

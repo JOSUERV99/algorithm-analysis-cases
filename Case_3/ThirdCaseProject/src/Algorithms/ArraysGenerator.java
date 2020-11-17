@@ -1,5 +1,10 @@
 package Algorithms;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class ArraysGenerator {
 
@@ -15,19 +20,9 @@ public class ArraysGenerator {
 	}	
 	
 	public int[] generateRandomNotRepeatedNumbers(int amountNumbers) {
-		Random randomGenerator = new Random();
-		int generatedList[] = new int[amountNumbers];
-		boolean usedList[] = new boolean[randomMaxRange];
-		
-		for (int currentIndex = 0; currentIndex < amountNumbers; currentIndex++) {
-			int numberToAdd =  randomGenerator.nextInt(randomMaxRange);
-			if (usedList[numberToAdd])
-				continue;
-			generatedList[currentIndex] = numberToAdd;
-			usedList[numberToAdd] = true;
-		}
-
-		return generatedList;
+		List<Integer> list = Arrays.stream(this.generateSortedNumbers(amountNumbers)).boxed().collect(Collectors.toList());
+		Collections.shuffle(list);
+		return list.stream().mapToInt(i->i).toArray();
 	}	
 
 	public int[] generateSortedNumbers(int amountNumbers) {
@@ -45,5 +40,5 @@ public class ArraysGenerator {
 
 		return generatedList;
 	}
-	
+		
 }
